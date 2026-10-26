@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>管理后台</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="sidebar-brand">管理后台</div>
+      <nav class="menu" aria-label="主导航">
+        <div class="menu-group is-open" id="releaseMenu">
+          <button class="menu-parent" type="button" aria-expanded="true" aria-controls="releaseSubmenu">
+            <span class="menu-parent-label">游戏盒版本与插件发布</span>
+            <svg class="chevron" viewBox="0 0 16 16" aria-hidden="true">
+              <path d="M4.2 6.2 8 10l3.8-3.8" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </button>
+          <div class="submenu" id="releaseSubmenu">
+            <button class="submenu-item is-active" type="button" data-page="version">游戏盒版本</button>
+            <button class="submenu-item" type="button" data-page="plugin">游戏盒插件</button>
+          </div>
+        </div>
+      </nav>
+    </aside>
+
+    <div class="workspace">
+      <header class="topbar">
+        <h1 class="title" id="pageTitle">游戏盒版本</h1>
+        <div class="topbar-actions">
+          <button class="btn-hotfix" type="button" id="hotfixBtn">发布热修复包</button>
+          <button class="btn-primary" type="button" id="addBtn">新增</button>
+        </div>
+      </header>
+      <main class="content">
+        <section class="panel" id="versionPage">
+          <table class="data-table">
+            <colgroup>
+              <col class="col-major" />
+              <col class="col-name" />
+              <col class="col-code" />
+              <col class="col-date" />
+              <col class="col-publisher" />
+              <col class="col-channel" />
+              <col class="col-link" />
+              <col class="col-note" />
+              <col class="col-action" />
+            </colgroup>
+            <thead>
+              <tr>
+                <th>主版本</th>
+                <th>版本名称</th>
+                <th>版本号</th>
+                <th>发布日期</th>
+                <th>发布人</th>
+                <th>发布渠道</th>
+                <th>版本链接</th>
+                <th>发布说明</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody id="versionTableBody"></tbody>
+          </table>
+        </section>
+        <section id="pluginPage" hidden>
+          <div class="sheet-bar" id="pluginSheetBar" role="tablist" aria-label="插件类型"></div>
+          <div class="panel sheet-panel" id="pluginSheetPanel">
+            <table class="data-table">
+              <colgroup id="pluginColgroup"></colgroup>
+              <thead id="pluginTableHead"></thead>
+              <tbody id="pluginTableBody"></tbody>
+            </table>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <div class="modal-mask" id="versionModal" hidden>
+    <div class="modal" role="dialog" aria-labelledby="versionModalTitle" aria-modal="true">
+      <h2 class="modal-title" id="versionModalTitle">新增版本</h2>
+      <form id="versionForm">
+        <div class="field">
+          <span>版本链接</span>
+          <div class="link-row">
+            <input type="url" name="link" placeholder="请输入版本链接" required />
+            <button class="btn-ghost" type="button" id="parseBtn">解析</button>
+          </div>
+          <span class="hint" id="parseHint" hidden>请先填写版本链接</span>
+        </div>
+        <label class="field">
+          <span>主版本</span>
+          <input type="text" name="major" placeholder="请输入主版本" required />
+        </label>
+        <label class="field">
+          <span>版本名称</span>
+          <input type="text" name="name" placeholder="请输入版本名称" required />
+        </label>
+        <label class="field">
+          <span>版本号</span>
+          <input type="text" name="code" placeholder="请输入版本号" required />
+        </label>
+        <label class="field">
+          <span>发布日期</span>
+          <input type="date" name="date" required />
+        </label>
+        <label class="field">
+          <span>发布渠道</span>
+          <input type="text" name="channel" placeholder="请输入发布渠道" required />
+        </label>
+        <label class="field">
+          <span>发布说明</span>
+          <textarea name="note" rows="4" placeholder="请填写这次发布的内容"></textarea>
+        </label>
+        <div class="modal-actions">
+          <button class="btn-ghost" type="button" id="versionCancelBtn">取消</button>
+          <button class="btn-primary" type="submit">确定</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal-mask" id="pluginModal" hidden>
+    <div class="modal" role="dialog" aria-labelledby="pluginModalTitle" aria-modal="true">
+      <h2 class="modal-title" id="pluginModalTitle">新增插件</h2>
+      <form id="pluginForm">
+        <label class="field">
+          <span>插件类型</span>
+          <select name="type" required>
+            <option value="" selected disabled>请选择插件类型</option>
+            <option value="云游戏插件">云游戏插件</option>
+            <option value="小游戏插件">小游戏插件</option>
+            <option value="flash小游戏插件">flash小游戏插件</option>
+            <option value="新充值插件">新充值插件</option>
+            <option value="旧充值插件">旧充值插件</option>
+            <option value="趣核插件">趣核插件</option>
+            <option value="盒子助手插件">盒子助手插件</option>
+            <option value="帖子模版">帖子模版</option>
+            <option value="游戏评论模版">游戏评论模版</option>
+          </select>
+        </label>
+        <label class="field">
+          <span id="pluginLinkLabel">插件链接</span>
+          <input type="url" name="link" placeholder="请输入插件链接" required />
+        </label>
+        <label class="field">
+          <span id="pluginVersionLabel">插件版本号</span>
+          <input type="text" name="version" placeholder="请输入插件版本号" required />
+        </label>
+        <label class="field">
+          <span id="pluginClientLabel">生效客户端版本</span>
+          <input type="text" name="clientVersion" placeholder="请输入生效客户端版本" required />
+        </label>
+        <label class="field">
+          <span>发布日期</span>
+          <input type="date" name="date" required />
+        </label>
+        <label class="field">
+          <span>发布说明</span>
+          <textarea name="note" rows="4" placeholder="请填写这次发布的内容"></textarea>
+        </label>
+        <div class="modal-actions">
+          <button class="btn-ghost" type="button" id="pluginCancelBtn">取消</button>
+          <button class="btn-primary" type="submit">确定</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal-mask" id="confirmModal" hidden>
+    <div class="modal confirm-modal" role="dialog" aria-labelledby="confirmTitle" aria-modal="true">
+      <h2 class="modal-title" id="confirmTitle">确认删除</h2>
+      <p class="confirm-text" id="confirmText">确定要删除这条版本记录吗？删除后不可恢复。</p>
+      <div class="modal-actions">
+        <button class="btn-ghost" type="button" id="confirmCancelBtn">取消</button>
+        <button class="btn-danger" type="button" id="confirmOkBtn">确认删除</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-mask" id="hotfixMask" hidden>
+    <div class="modal hotfix-shell" role="dialog" aria-modal="true" aria-labelledby="hotfixTitle">
+      <header class="hotfix-head">
+        <h2 class="modal-title" id="hotfixTitle">热更新任务管理</h2>
+        <div class="topbar-actions">
+          <button class="btn-ghost" type="button" id="hotfixRefresh">刷新列表</button>
+          <button class="btn-primary" type="button" id="hotfixAdd">新增任务</button>
+          <button class="btn-ghost" type="button" id="hotfixClose">关闭</button>
+        </div>
+      </header>
+      <div class="hotfix-body">
+        <form class="hotfix-search" id="hotfixSearch">
+          <label>任务名称
+            <input name="keyword" placeholder="名称 / 任务ID" />
+          </label>
+          <label>目标版本
+            <input name="target" placeholder="例如 9.0.4" />
+          </label>
+          <label>状态
+            <select name="status">
+              <option value="">全部</option>
+              <option value="running">处理中</option>
+              <option value="failed">部分失败</option>
+              <option value="done">已完成</option>
+            </select>
+          </label>
+          <div class="hotfix-search-actions">
+            <button class="btn-primary" type="submit">搜索</button>
+            <button class="btn-ghost" type="button" id="hotfixReset">重置</button>
+          </div>
+        </form>
+        <div class="panel">
+          <table class="data-table hotfix-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>任务名称</th>
+                <th>完整包 / 适用基准版本</th>
+                <th>补丁进度</th>
+                <th>处理状态</th>
+                <th>管理员 / 创建时间</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody id="hotfixRows"></tbody>
+          </table>
+        </div>
+        <div class="hotfix-pager">
+          <span id="hotfixCount"></span>
+          <div class="hotfix-pages" id="hotfixPages"></div>
+          <label class="hotfix-page-size">每页
+            <select id="hotfixPageSize">
+              <option value="5">5</option>
+              <option value="10">10</option>
+              <option value="20">20</option>
+            </select>
+            条
+          </label>
+        </div>
+        <p class="hotfix-note">演示页面不自动刷新。点击「刷新列表」或详情中的「刷新进度」推进模拟处理。数据仅保留在当前页面，浏览器刷新后重置。</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-mask" id="hotfixDialog" hidden>
+    <div class="modal hotfix-dialog" role="dialog" aria-modal="true" aria-labelledby="hotfixDialogTitle">
+      <h2 class="modal-title" id="hotfixDialogTitle"></h2>
+      <div id="hotfixDialogBody"></div>
+      <footer class="hotfix-footer">
+        <span class="hotfix-help" id="hotfixDialogHelp"></span>
+        <div class="modal-actions" id="hotfixDialogActions"></div>
+      </footer>
+    </div>
+  </div>
+
+  <div class="modal-mask" id="hotfixPicker" hidden>
+    <div class="modal hotfix-picker" role="dialog" aria-modal="true" aria-labelledby="hotfixPickerTitle">
+      <h2 class="modal-title" id="hotfixPickerTitle">选择基准包</h2>
+      <div id="hotfixPickerBody"></div>
+      <footer class="hotfix-footer">
+        <span class="hotfix-help" id="hotfixPickerCount"></span>
+        <div class="modal-actions">
+          <button class="btn-ghost" type="button" id="hotfixPickerClear">清空已选</button>
+          <button class="btn-ghost" type="button" id="hotfixPickerCancel">取消</button>
+          <button class="btn-primary" type="button" id="hotfixPickerConfirm">确认选择</button>
+        </div>
+      </footer>
+    </div>
+  </div>
+
+  <div class="hotfix-toast" id="hotfixToast" role="status" hidden></div>
+
+  <script src="app.js"></script>
+  <script src="hotfix.js"></script>
+</body>
+</html>
