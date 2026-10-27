@@ -445,7 +445,7 @@ function renderPluginRecords() {
        <col class="col-plugin-note" />
        <col class="col-plugin-action" />`;
   const headers = activePluginType === POST_TEMPLATE_TYPE
-    ? ["帖子模版版本号", "生效最低版本号", "发布日期", "发布人员", "模版链接", "发布说明", "操作"]
+    ? ["帖子模版版本号", "生效最低版本号", "发布日期", "发布人", "模版链接", "发布说明", "操作"]
     : activePluginType === GAME_COMMENT_TYPE
       ? ["游戏评论模版版本号", "生效最低版本号", "发布日期", "发布人", "模版链接", "发布说明", "操作"]
       : ["插件版本号", "生效客户端版本", "发布日期", "发布人", "插件链接", "发布说明", "操作"];
