@@ -222,12 +222,17 @@ select {
   color: var(--muted);
 }
 
-.col-beta-name { width: 16%; }
-.col-beta-version { width: 12%; }
+.col-beta-name { width: 14%; }
+.col-beta-version { width: 10%; }
 .col-beta-size { width: 11%; }
-.col-beta-period { width: 22%; }
-.col-beta-updated { width: 16%; }
-.col-beta-action { width: 23%; }
+.col-beta-link { width: 15%; }
+.col-beta-period { width: 16%; }
+.col-beta-updated { width: 12%; }
+.col-beta-action { width: 22%; }
+
+#betaListMask .beta-size {
+  white-space: nowrap;
+}
 
 .content {
   flex: 1;

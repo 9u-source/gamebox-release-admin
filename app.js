@@ -383,10 +383,10 @@ const updateContents = [
 ];
 
 const betaReleases = [
-  { id: 1, versionId: 1, popupTitle: "V9.7游戏盒公测活动", appName: "4399游戏盒V9.7", version: "9.7.0.30", size: "186.4 MB", start: "2026-10-20 10:00", end: "2026-11-20 23:59", intro: "抢先体验全新首页和登录改版", entryScope: "all", homePopup: "yes", crowd: "97gongce", lowPercent: 20, midPercent: 20, highPercent: 20, ultraPercent: 20, targetVersions: "", updatedAt: "2026-10-23 18:26" },
-  { id: 2, versionId: 2, popupTitle: "V9.6游戏盒公测活动", appName: "4399游戏盒V9.6", version: "9.6.1.12", size: "179.8 MB", start: "2026-09-28 10:00", end: "2026-10-28 23:59", intro: "灰度验证登录改版", entryScope: "all", homePopup: "yes", crowd: "96gongce", lowPercent: 15, midPercent: 10, highPercent: 30, ultraPercent: 5, targetVersions: "9.6.1.12", updatedAt: "2026-09-28 16:42" },
-  { id: 3, versionId: 3, popupTitle: "V9.6游戏盒公测活动", appName: "4399游戏盒V9.6", version: "9.6.0.8", size: "172.3 MB", start: "2026-09-12 09:30", end: "2026-10-12 23:59", intro: "内测包，新增消息中心", entryScope: "all", homePopup: "yes", crowd: "96beta", lowPercent: 20, midPercent: 20, highPercent: 20, ultraPercent: 20, targetVersions: "", updatedAt: "2026-09-15 11:08" },
-  { id: 4, versionId: 4, popupTitle: "V9.5游戏盒公测活动", appName: "4399游戏盒V9.5", version: "9.5.2.4", size: "165.1 MB", start: "2026-08-18 10:00", end: "2026-09-18 23:59", intro: "稳定版功能回归", entryScope: "all", homePopup: "yes", crowd: "95gongce", lowPercent: 25, midPercent: 25, highPercent: 25, ultraPercent: 25, targetVersions: "5.4.1.29,9.5.2.4", updatedAt: "2026-08-18 14:15" },
+  { id: 1, versionId: 1, popupTitle: "V9.7游戏盒公测活动", appName: "4399游戏盒V9.7", version: "9.7.0.30", size: "186.4 MB", downloadLink: "https://dlstest.img4399.com/redirect/ftp/client/appftp/9.7/tinker/9.7.0.30/release_pub/4399Game_9.7.0.30.2401.apk", start: "2026-10-20 10:00", end: "2026-11-20 23:59", intro: "抢先体验全新首页和登录改版", entryScope: "all", homePopup: "yes", crowd: "97gongce", lowPercent: 20, midPercent: 20, highPercent: 20, ultraPercent: 20, targetVersions: "", updatedAt: "2026-10-23 18:26" },
+  { id: 2, versionId: 2, popupTitle: "V9.6游戏盒公测活动", appName: "4399游戏盒V9.6", version: "9.6.1.12", size: "179.8 MB", downloadLink: "https://dlstest.img4399.com/redirect/ftp/client/appftp/9.6/tinker/9.6.1.12/release_pub/4399Game_9.6.1.12.2388.apk", start: "2026-09-28 10:00", end: "2026-10-28 23:59", intro: "灰度验证登录改版", entryScope: "all", homePopup: "yes", crowd: "96gongce", lowPercent: 15, midPercent: 10, highPercent: 30, ultraPercent: 5, targetVersions: "9.6.1.12", updatedAt: "2026-09-28 16:42" },
+  { id: 3, versionId: 3, popupTitle: "V9.6游戏盒公测活动", appName: "4399游戏盒V9.6", version: "9.6.0.8", size: "172.3 MB", downloadLink: "https://dlstest.img4399.com/redirect/ftp/client/appftp/9.6/tinker/9.6.0.8/release_pub/4399Game_9.6.0.8.2360.apk", start: "2026-09-12 09:30", end: "2026-10-12 23:59", intro: "内测包，新增消息中心", entryScope: "all", homePopup: "yes", crowd: "96beta", lowPercent: 20, midPercent: 20, highPercent: 20, ultraPercent: 20, targetVersions: "", updatedAt: "2026-09-15 11:08" },
+  { id: 4, versionId: 4, popupTitle: "V9.5游戏盒公测活动", appName: "4399游戏盒V9.5", version: "9.5.2.4", size: "165.1 MB", downloadLink: "https://dlstest.img4399.com/redirect/ftp/client/appftp/9.5/tinker/9.5.2.4/release_pub/4399Game_9.5.2.4.2291.apk", start: "2026-08-18 10:00", end: "2026-09-18 23:59", intro: "稳定版功能回归", entryScope: "all", homePopup: "yes", crowd: "95gongce", lowPercent: 25, midPercent: 25, highPercent: 25, ultraPercent: 25, targetVersions: "5.4.1.29,9.5.2.4", updatedAt: "2026-08-18 14:15" },
 ];
 let activePluginType = PLUGIN_TYPES[0];
 
@@ -585,13 +585,14 @@ function closePluginModal() {
 
 function renderBetaList() {
   if (betaReleases.length === 0) {
-    betaTableBody.innerHTML = '<tr><td class="empty" colspan="6">暂无公测记录</td></tr>';
+    betaTableBody.innerHTML = '<tr><td class="empty" colspan="7">暂无公测记录</td></tr>';
     return;
   }
   betaTableBody.innerHTML = betaReleases.map((item) => `<tr>
     <td>${escapeHtml(item.appName)}</td>
     <td>${escapeHtml(item.version)}</td>
-    <td>${escapeHtml(item.size)}</td>
+    <td class="beta-size">${escapeHtml(item.size)}</td>
+    <td class="link-cell">${item.downloadLink ? `<a href="${escapeHtml(item.downloadLink)}" target="_blank" rel="noopener noreferrer">${escapeHtml(item.downloadLink)}</a>` : ""}</td>
     <td><div class="beta-period"><span>${escapeHtml(item.start)}</span><span>至 ${escapeHtml(item.end)}</span></div></td>
     <td>${escapeHtml(item.updatedAt)}</td>
     <td class="action-cell">
@@ -1384,6 +1385,7 @@ function readBetaConfig() {
     popupTitle,
     appName,
     version: record.name,
+    downloadLink: record.link,
     start: start.replace("T", " "),
     end: end.replace("T", " "),
     intro,
