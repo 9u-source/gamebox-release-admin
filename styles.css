@@ -222,12 +222,13 @@ select {
   color: var(--muted);
 }
 
-.col-beta-name { width: 14%; }
-.col-beta-version { width: 10%; }
-.col-beta-size { width: 11%; }
-.col-beta-link { width: 15%; }
-.col-beta-period { width: 16%; }
-.col-beta-updated { width: 12%; }
+.col-beta-name { width: 15%; }
+.col-beta-version { width: 9%; }
+.col-beta-size { width: 10%; }
+.col-beta-link { width: 10%; }
+.col-beta-period { width: 14%; }
+.col-beta-updated { width: 11%; }
+.col-beta-status { width: 9%; }
 .col-beta-action { width: 22%; }
 
 #betaListMask .beta-size {
@@ -266,7 +267,8 @@ select {
   background: #fff7e6;
 }
 
-.update-mode.is-online {
+.update-mode.is-online,
+.update-mode.is-published {
   color: #08979c;
   background: #e6fffb;
 }
@@ -1054,7 +1056,12 @@ select {
 #hotfixPicker { z-index: 40; }
 #betaListMask { z-index: 25; }
 #betaModal { z-index: 35; }
+#betaWhitelistMask { z-index: 40; }
 #confirmModal { z-index: 50; }
+
+.whitelist-modal {
+  width: min(560px, calc(100vw - 48px));
+}
 
 .hotfix-shell,
 .hotfix-dialog,

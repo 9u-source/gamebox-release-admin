@@ -383,12 +383,13 @@ const updateContents = [
 ];
 
 const betaReleases = [
-  { id: 1, versionId: 1, popupTitle: "V9.7游戏盒公测活动", appName: "4399游戏盒V9.7", version: "9.7.0.30", size: "186.4 MB", downloadLink: "https://dlstest.img4399.com/redirect/ftp/client/appftp/9.7/tinker/9.7.0.30/release_pub/4399Game_9.7.0.30.2401.apk", start: "2026-10-20 10:00", end: "2026-11-20 23:59", intro: "抢先体验全新首页和登录改版", entryScope: "all", homePopup: "yes", crowd: "97gongce", lowPercent: 20, midPercent: 20, highPercent: 20, ultraPercent: 20, targetVersions: "", updatedAt: "2026-10-23 18:26" },
-  { id: 2, versionId: 2, popupTitle: "V9.6游戏盒公测活动", appName: "4399游戏盒V9.6", version: "9.6.1.12", size: "179.8 MB", downloadLink: "https://dlstest.img4399.com/redirect/ftp/client/appftp/9.6/tinker/9.6.1.12/release_pub/4399Game_9.6.1.12.2388.apk", start: "2026-09-28 10:00", end: "2026-10-28 23:59", intro: "灰度验证登录改版", entryScope: "all", homePopup: "yes", crowd: "96gongce", lowPercent: 15, midPercent: 10, highPercent: 30, ultraPercent: 5, targetVersions: "9.6.1.12", updatedAt: "2026-09-28 16:42" },
-  { id: 3, versionId: 3, popupTitle: "V9.6游戏盒公测活动", appName: "4399游戏盒V9.6", version: "9.6.0.8", size: "172.3 MB", downloadLink: "https://dlstest.img4399.com/redirect/ftp/client/appftp/9.6/tinker/9.6.0.8/release_pub/4399Game_9.6.0.8.2360.apk", start: "2026-09-12 09:30", end: "2026-10-12 23:59", intro: "内测包，新增消息中心", entryScope: "all", homePopup: "yes", crowd: "96beta", lowPercent: 20, midPercent: 20, highPercent: 20, ultraPercent: 20, targetVersions: "", updatedAt: "2026-09-15 11:08" },
-  { id: 4, versionId: 4, popupTitle: "V9.5游戏盒公测活动", appName: "4399游戏盒V9.5", version: "9.5.2.4", size: "165.1 MB", downloadLink: "https://dlstest.img4399.com/redirect/ftp/client/appftp/9.5/tinker/9.5.2.4/release_pub/4399Game_9.5.2.4.2291.apk", start: "2026-08-18 10:00", end: "2026-09-18 23:59", intro: "稳定版功能回归", entryScope: "all", homePopup: "yes", crowd: "95gongce", lowPercent: 25, midPercent: 25, highPercent: 25, ultraPercent: 25, targetVersions: "5.4.1.29,9.5.2.4", updatedAt: "2026-08-18 14:15" },
+  { id: 1, versionId: 1, popupTitle: "V9.7游戏盒公测活动", appName: "4399游戏盒V9.7", version: "9.7.0.30", size: "186.4 MB", downloadLink: "https://dlstest.img4399.com/redirect/ftp/client/appftp/9.7/tinker/9.7.0.30/release_pub/4399Game_9.7.0.30.2401.apk", publishStatus: "published", start: "2026-10-20 10:00", end: "2026-11-20 23:59", intro: "抢先体验全新首页和登录改版", entryScope: "all", homePopup: "yes", crowd: "97gongce", lowPercent: 20, midPercent: 20, highPercent: 20, ultraPercent: 20, targetVersions: "", updatedAt: "2026-10-23 18:26" },
+  { id: 2, versionId: 2, popupTitle: "V9.6游戏盒公测活动", appName: "4399游戏盒V9.6", version: "9.6.1.12", size: "179.8 MB", downloadLink: "https://dlstest.img4399.com/redirect/ftp/client/appftp/9.6/tinker/9.6.1.12/release_pub/4399Game_9.6.1.12.2388.apk", publishStatus: "published", start: "2026-09-28 10:00", end: "2026-10-28 23:59", intro: "灰度验证登录改版", entryScope: "all", homePopup: "yes", crowd: "96gongce", lowPercent: 15, midPercent: 10, highPercent: 30, ultraPercent: 5, targetVersions: "9.6.1.12", updatedAt: "2026-09-28 16:42" },
+  { id: 3, versionId: 3, popupTitle: "V9.6游戏盒公测活动", appName: "4399游戏盒V9.6", version: "9.6.0.8", size: "172.3 MB", downloadLink: "https://dlstest.img4399.com/redirect/ftp/client/appftp/9.6/tinker/9.6.0.8/release_pub/4399Game_9.6.0.8.2360.apk", publishStatus: "preview", start: "2026-09-12 09:30", end: "2026-10-12 23:59", intro: "内测包，新增消息中心", entryScope: "all", homePopup: "yes", crowd: "96beta", lowPercent: 20, midPercent: 20, highPercent: 20, ultraPercent: 20, targetVersions: "", updatedAt: "2026-09-15 11:08" },
+  { id: 4, versionId: 4, popupTitle: "V9.5游戏盒公测活动", appName: "4399游戏盒V9.5", version: "9.5.2.4", size: "165.1 MB", downloadLink: "https://dlstest.img4399.com/redirect/ftp/client/appftp/9.5/tinker/9.5.2.4/release_pub/4399Game_9.5.2.4.2291.apk", publishStatus: "published", start: "2026-08-18 10:00", end: "2026-09-18 23:59", intro: "稳定版功能回归", entryScope: "all", homePopup: "yes", crowd: "95gongce", lowPercent: 25, midPercent: 25, highPercent: 25, ultraPercent: 25, targetVersions: "5.4.1.29,9.5.2.4", updatedAt: "2026-08-18 14:15" },
 ];
 let activePluginType = PLUGIN_TYPES[0];
+const betaPopupWhitelist = { udids: [], crowds: [] };
 
 const menuGroup = document.getElementById("releaseMenu");
 const parentButton = menuGroup.querySelector(".menu-parent");
@@ -406,6 +407,11 @@ const versionTableBody = document.getElementById("versionTableBody");
 const addBtn = document.getElementById("addBtn");
 const betaListMask = document.getElementById("betaListMask");
 const betaListClose = document.getElementById("betaListClose");
+const betaWhitelistBtn = document.getElementById("betaWhitelistBtn");
+const betaWhitelistMask = document.getElementById("betaWhitelistMask");
+const betaWhitelistForm = document.getElementById("betaWhitelistForm");
+const betaWhitelistHint = document.getElementById("betaWhitelistHint");
+const betaWhitelistCancel = document.getElementById("betaWhitelistCancel");
 const betaAddBtn = document.getElementById("betaAddBtn");
 const betaTableBody = document.getElementById("betaTableBody");
 const betaBtn = document.getElementById("betaBtn");
@@ -585,7 +591,7 @@ function closePluginModal() {
 
 function renderBetaList() {
   if (betaReleases.length === 0) {
-    betaTableBody.innerHTML = '<tr><td class="empty" colspan="7">暂无公测记录</td></tr>';
+    betaTableBody.innerHTML = '<tr><td class="empty" colspan="8">暂无公测记录</td></tr>';
     return;
   }
   betaTableBody.innerHTML = betaReleases.map((item) => `<tr>
@@ -595,6 +601,7 @@ function renderBetaList() {
     <td class="link-cell">${item.downloadLink ? `<a href="${escapeHtml(item.downloadLink)}" target="_blank" rel="noopener noreferrer">${escapeHtml(item.downloadLink)}</a>` : ""}</td>
     <td><div class="beta-period"><span>${escapeHtml(item.start)}</span><span>至 ${escapeHtml(item.end)}</span></div></td>
     <td>${escapeHtml(item.updatedAt)}</td>
+    <td><span class="update-mode ${item.publishStatus === "published" ? "is-published" : "is-preview"}">${item.publishStatus === "published" ? "发布" : "预览"}</span></td>
     <td class="action-cell">
       <button class="btn-link" type="button" data-action="audience" data-id="${item.id}">推送人群</button>
       <button class="btn-link" type="button" data-action="config" data-id="${item.id}">公测配置</button>
@@ -611,7 +618,49 @@ function showBetaList() {
 
 function hideBetaList() {
   if (!betaModal.hidden) closeBetaModal();
+  if (!betaWhitelistMask.hidden) closeBetaWhitelist();
   betaListMask.hidden = true;
+}
+
+function showWhitelistHint(message) {
+  betaWhitelistHint.textContent = message;
+  betaWhitelistHint.hidden = !message;
+}
+
+function openBetaWhitelist() {
+  showWhitelistHint("");
+  betaWhitelistForm.elements.udids.value = betaPopupWhitelist.udids.join("\n");
+  betaWhitelistForm.elements.crowds.value = betaPopupWhitelist.crowds.join(",");
+  betaWhitelistMask.hidden = false;
+  betaWhitelistForm.elements.udids.focus();
+}
+
+function closeBetaWhitelist() {
+  showWhitelistHint("");
+  betaWhitelistMask.hidden = true;
+}
+
+function saveBetaWhitelist() {
+  const crowdText = betaWhitelistForm.elements.crowds.value;
+  if (crowdText.includes("，")) {
+    showWhitelistHint("人群请使用英文逗号分隔");
+    betaWhitelistForm.elements.crowds.focus();
+    return;
+  }
+  const udids = [];
+  betaWhitelistForm.elements.udids.value.split(/\r?\n/).forEach((line) => {
+    const udid = line.trim();
+    if (udid && !udids.includes(udid)) udids.push(udid);
+  });
+  const crowds = [];
+  crowdText.split(",").forEach((part) => {
+    const crowd = part.trim();
+    if (crowd && !crowds.includes(crowd)) crowds.push(crowd);
+  });
+  betaPopupWhitelist.udids = udids;
+  betaPopupWhitelist.crowds = crowds;
+  closeBetaWhitelist();
+  showBetaToast("已保存公测弹窗白名单");
 }
 
 function showPage(page) {
@@ -766,6 +815,7 @@ function openBetaModal(mode = "create", item = null) {
     betaForm.elements.start.value = item.start.replace(" ", "T");
     betaForm.elements.end.value = item.end.replace(" ", "T");
     betaForm.elements.intro.value = item.intro;
+    betaForm.elements.publishStatus.value = item.publishStatus === "published" ? "published" : "preview";
     betaForm.elements.entryScope.value = item.entryScope === "selected" ? "selected" : "all";
     betaForm.elements.homePopup.value = item.homePopup === "no" ? "no" : "yes";
     betaForm.elements.entryCopy.value = item.entryCopy || "";
@@ -849,6 +899,16 @@ addBtn.addEventListener("click", () => {
 
 betaBtn.addEventListener("click", showBetaList);
 betaListClose.addEventListener("click", hideBetaList);
+betaWhitelistBtn.addEventListener("click", openBetaWhitelist);
+betaWhitelistCancel.addEventListener("click", closeBetaWhitelist);
+betaWhitelistMask.addEventListener("click", (event) => {
+  if (event.target === betaWhitelistMask) closeBetaWhitelist();
+});
+betaWhitelistForm.addEventListener("input", () => showWhitelistHint(""));
+betaWhitelistForm.addEventListener("submit", (event) => {
+  event.preventDefault();
+  saveBetaWhitelist();
+});
 betaAddBtn.addEventListener("click", () => openBetaModal());
 
 betaTableBody.addEventListener("click", (event) => {
@@ -1389,6 +1449,7 @@ function readBetaConfig() {
     start: start.replace("T", " "),
     end: end.replace("T", " "),
     intro,
+    publishStatus: betaForm.elements.publishStatus.value === "published" ? "published" : "preview",
     entryScope: betaForm.elements.entryScope.value === "selected" ? "selected" : "all",
     homePopup: betaForm.elements.homePopup.value === "no" ? "no" : "yes",
     entryCopy: betaForm.elements.entryCopy.value.trim(),

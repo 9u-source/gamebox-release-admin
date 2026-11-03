@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>管理后台</title>
-  <link rel="stylesheet" href="styles.css?v=11" />
+  <link rel="stylesheet" href="styles.css?v=14" />
 </head>
 <body>
   <div class="layout">
@@ -197,6 +197,7 @@
       <header class="hotfix-head">
         <h2 class="modal-title" id="betaListTitle">公测列表</h2>
         <div class="topbar-actions">
+          <button class="btn-primary" type="button" id="betaWhitelistBtn">公测弹窗白名单</button>
           <button class="btn-beta" type="button" id="betaAddBtn">新增公测</button>
           <button class="btn-ghost" type="button" id="betaListClose">关闭</button>
         </div>
@@ -211,6 +212,7 @@
               <col class="col-beta-link" />
               <col class="col-beta-period" />
               <col class="col-beta-updated" />
+              <col class="col-beta-status" />
               <col class="col-beta-action" />
             </colgroup>
             <thead>
@@ -221,6 +223,7 @@
                 <th>下载链接</th>
                 <th>开始与结束时间</th>
                 <th>更新时间</th>
+                <th>发布状态</th>
                 <th>操作</th>
               </tr>
             </thead>
@@ -242,6 +245,19 @@
             <option value="" selected disabled>请选择游戏盒版本</option>
           </select>
         </label>
+        <div class="field beta-switch">
+          <span>发布状态</span>
+          <div class="beta-switch-options" role="radiogroup" aria-label="发布状态">
+            <label>
+              <input type="radio" name="publishStatus" value="preview" checked />
+              <span>预览</span>
+            </label>
+            <label>
+              <input type="radio" name="publishStatus" value="published" />
+              <span>发布</span>
+            </label>
+          </div>
+        </div>
         <label class="field">
           <span>弹窗标题</span>
           <input type="text" name="popupTitle" placeholder="选择版本后自动生成，可修改" />
@@ -540,10 +556,31 @@
     </div>
   </div>
 
+  <div class="modal-mask" id="betaWhitelistMask" hidden>
+    <div class="modal whitelist-modal" role="dialog" aria-labelledby="betaWhitelistTitle" aria-modal="true">
+      <h2 class="modal-title" id="betaWhitelistTitle">公测弹窗白名单</h2>
+      <form id="betaWhitelistForm" novalidate>
+        <label class="field">
+          <span>UDID</span>
+          <textarea name="udids" rows="6" placeholder="每行一个 UDID"></textarea>
+        </label>
+        <label class="field">
+          <span>人群</span>
+          <input type="text" name="crowds" placeholder="多个用英文逗号隔开" />
+        </label>
+        <span class="hint" id="betaWhitelistHint" hidden></span>
+        <div class="modal-actions">
+          <button class="btn-ghost" type="button" id="betaWhitelistCancel">取消</button>
+          <button class="btn-beta" type="submit">确定</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <div class="hotfix-toast" id="hotfixToast" role="status" hidden></div>
   <div class="hotfix-toast" id="betaToast" role="status" hidden></div>
 
-  <script src="app.js?v=12"></script>
+  <script src="app.js?v=14"></script>
   <script src="hotfix.js?v=9"></script>
 </body>
 </html>
