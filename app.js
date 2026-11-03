@@ -720,11 +720,27 @@ function fillBetaVersions() {
   if (versionRecords.some((record) => String(record.id) === current)) select.value = current;
 }
 
+function matchUpdateContentId(major) {
+  const matches = updateContents.filter((item) => item.major === major);
+  matches.sort((a, b) => (a.updatedAt < b.updatedAt ? 1 : a.updatedAt > b.updatedAt ? -1 : b.id - a.id));
+  return matches.length ? String(matches[0].id) : "";
+}
+
+function fillUpdateContents(selectedId) {
+  const select = betaForm.elements.updateContentId;
+  const current = selectedId == null ? "" : String(selectedId);
+  select.innerHTML = `<option value="">请选择</option>${updateContents
+    .map((item) => `<option value="${item.id}">${escapeHtml(item.major)}</option>`)
+    .join("")}`;
+  select.value = updateContents.some((item) => String(item.id) === current) ? current : "";
+}
+
 function syncBetaDerived() {
   const record = versionRecords.find((item) => String(item.id) === betaForm.elements.versionId.value);
   const copy = record ? betaCopy(record) : { popupTitle: "", appName: "" };
   betaForm.elements.popupTitle.value = copy.popupTitle;
   betaForm.elements.appName.value = copy.appName;
+  fillUpdateContents(record ? matchUpdateContentId(record.major) : "");
 }
 
 function betaStamp() {
@@ -754,6 +770,12 @@ function openBetaModal(mode = "create", item = null) {
     betaForm.elements.entryCopy.value = item.entryCopy || "";
     setBetaAsset(betaForm.elements.entryBg, item.entryBg, item.entryBgPreview);
     setBetaAsset(betaForm.elements.entryIcon, item.entryIcon, item.entryIconPreview);
+    const saved = updateContents.some((row) => row.id === item.updateContentId)
+      ? item.updateContentId
+      : matchUpdateContentId(versionRecords.find((row) => row.id === item.versionId)?.major);
+    fillUpdateContents(saved);
+  } else if (mode !== "audience") {
+    fillUpdateContents("");
   }
   if (item && mode !== "config") {
     betaForm.elements.crowd.value = item.crowd;
@@ -1372,6 +1394,7 @@ function readBetaConfig() {
     entryBgPreview: betaAssetPreview(betaForm.elements.entryBg),
     entryIcon: betaForm.elements.entryIcon.value.trim(),
     entryIconPreview: betaAssetPreview(betaForm.elements.entryIcon),
+    updateContentId: Number(betaForm.elements.updateContentId.value) || null,
     crowdUpdates,
   };
 }

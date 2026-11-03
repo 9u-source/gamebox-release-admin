@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>管理后台</title>
-  <link rel="stylesheet" href="styles.css?v=7" />
+  <link rel="stylesheet" href="styles.css?v=8" />
 </head>
 <body>
   <div class="layout">
@@ -314,7 +314,15 @@
             <img class="beta-upload-preview" data-preview="entryIcon" alt="" hidden />
           </div>
         </div>
-        <button class="beta-crowd-toggle" type="button" id="betaCrowdAdd">+人群定制</button>
+        <div class="beta-content-pick">
+          <label class="beta-asset">
+            <span>游戏盒版本更新内容</span>
+            <select name="updateContentId">
+              <option value="">请选择</option>
+            </select>
+          </label>
+          <button class="beta-crowd-toggle" type="button" id="betaCrowdAdd">+人群定制</button>
+        </div>
         <section class="beta-crowd-section" id="betaCrowdUpdates" hidden aria-label="更新内容(人群定制)">
           <div class="beta-updates is-label">
             <div class="beta-updates-title"><i>*</i>更新内容(人群定制):</div>
@@ -533,7 +541,7 @@
   <div class="hotfix-toast" id="hotfixToast" role="status" hidden></div>
   <div class="hotfix-toast" id="betaToast" role="status" hidden></div>
 
-  <script src="app.js?v=9"></script>
+  <script src="app.js?v=10"></script>
   <script src="hotfix.js?v=9"></script>
 </body>
 </html>
