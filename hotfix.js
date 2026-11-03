@@ -40,7 +40,7 @@ const baseCatalog = [
     publisher: "运营管理员",
     date: "2026-08-15",
     channel: "gongce4399",
-    note: "历史完整基准包（演示）",
+    note: "历史完整基准包",
     kind: "full",
   })),
 ];
@@ -178,17 +178,17 @@ function renderList() {
     return `<tr>
       <td>${task.id}</td>
       <td><button class="btn-link" type="button" data-action="detail" data-id="${task.id}">${esc(task.name)}</button></td>
-      <td>${task.sources.map((source) => `<div class="hotfix-source"><b>${esc(source.target)}</b> ← ${source.bases.map(esc).join("、")}<div class="hotfix-help">1 份完整包 / ${source.bases.length} 个补丁</div></div>`).join("")}</td>
-      <td>${ready} / ${children.length} 就绪<div class="hotfix-progress"><span style="width:${width}%"></span></div></td>
+      <td>${task.sources.map((source) => `<div class="hotfix-source"><b>${esc(source.target)}</b><span>基准 ${source.bases.map(esc).join("、")}</span></div>`).join("")}</td>
+      <td class="hotfix-progress-cell">${ready} / ${children.length}<div class="hotfix-progress"><span style="width:${width}%"></span></div></td>
       <td>${statusTag(task)}</td>
-      <td>运营管理员<div class="hotfix-help">${esc(task.date)}</div></td>
+      <td>${esc(task.date)}</td>
       <td class="action-cell">
         <button class="btn-link" type="button" data-action="detail" data-id="${task.id}">补丁包管理</button>
         <button class="btn-link" type="button" data-action="config" data-id="${task.id}">配置管理</button>
       </td>
     </tr>`;
   }).join("") || '<tr><td class="empty" colspan="7">暂无符合条件的任务</td></tr>';
-  document.getElementById("hotfixCount").textContent = `共 ${list.length} 条记录，当前第 ${listPage} / ${pages} 页`;
+  document.getElementById("hotfixCount").textContent = `共 ${list.length} 条`;
   document.getElementById("hotfixPages").innerHTML = `<button type="button" data-page="${listPage - 1}" ${listPage === 1 ? "disabled" : ""}>上一页</button>`
     + Array.from({ length: pages }, (_, index) => `<button type="button" data-page="${index + 1}" class="${index + 1 === listPage ? "is-active" : ""}">${index + 1}</button>`).join("")
     + `<button type="button" data-page="${listPage + 1}" ${listPage === pages ? "disabled" : ""}>下一页</button>`;
@@ -225,7 +225,8 @@ function closeDialog() {
 }
 
 function setDialogFooter(help, actions) {
-  hotfixDialogHelp.textContent = help;
+  hotfixDialogHelp.textContent = help || "";
+  hotfixDialogHelp.hidden = !help;
   hotfixDialogActions.innerHTML = actions;
 }
 
@@ -234,24 +235,30 @@ function field(label, html, required = false) {
 }
 
 function configFields(task) {
-  return `<div class="hotfix-section">统一升级配置</div>
-    ${field("升级范围", `<select id="hotfixGray"><option value="ratio" ${task.gray === "ratio" ? "selected" : ""}>灰度升级 - 比例</option><option value="all" ${task.gray === "all" ? "selected" : ""}>全部升级</option></select>`)}
-    <div id="hotfixGrayFields" ${task.gray === "all" ? "hidden" : ""}>
-      ${field("万分比", `<div class="hotfix-inline"><input class="hotfix-short" id="hotfixMod" type="number" min="1" max="10000" step="1" value="${Math.round(task.ratio * 100)}"><span class="hotfix-help" id="hotfixRatioHint">即 ${task.ratio}% 的设备</span></div>`, true)}
+  const ratio = Math.round(task.ratio * 100);
+  return `<div class="hotfix-section">升级配置</div>
+    <div class="hotfix-grid">
+      ${field("升级范围", `<select id="hotfixGray"><option value="ratio" ${task.gray === "ratio" ? "selected" : ""}>灰度</option><option value="all" ${task.gray === "all" ? "selected" : ""}>全部</option></select>`)}
       ${field("网络", `<select id="hotfixWifi"><option value="0" ${!task.wifi ? "selected" : ""}>全部网络</option><option value="1" ${task.wifi ? "selected" : ""}>仅 Wi-Fi</option></select>`)}
-      ${field("指定测试设备", `<textarea class="hotfix-input" id="hotfixUdids" rows="2" placeholder="多个 UDID 用英文逗号分隔，最多 4 个">${esc(task.udids)}</textarea><p class="hotfix-help">仅在灰度升级时生效；填写后仅向这些设备下发，仍需满足其他灰度条件。</p>`)}
-    </div>
-    ${field("后台自动重启", `<label class="hotfix-check"><input id="hotfixReboot" type="checkbox" ${task.reboot ? "checked" : ""}>客户端切到后台后自动重启</label>`)}
-    ${field("自清除上限次数", `<div class="hotfix-inline"><input class="hotfix-short" id="hotfixSelfClear" type="number" min="1" max="20" step="1" value="${task.clear}"><span class="hotfix-help">默认为 3</span></div>`)}
-    ${field("更新描述", `<textarea class="hotfix-input" id="hotfixDescription" rows="3">${esc(task.description)}</textarea>`)}`;
+      <div id="hotfixRatioField" ${task.gray === "all" ? "hidden" : ""}>${field("万分比", `<div class="hotfix-inline"><input class="hotfix-input" id="hotfixMod" type="number" min="1" max="10000" step="1" value="${ratio}"><span class="hotfix-help" id="hotfixRatioHint">即 ${task.ratio}%</span></div>`, true)}</div>
+      ${field("自清除次数", `<input class="hotfix-input" id="hotfixSelfClear" type="number" min="1" max="20" step="1" value="${task.clear}">`)}
+      <div class="span-2" id="hotfixUdidField" ${task.gray === "all" ? "hidden" : ""}>${field("测试设备", `<input class="hotfix-input" id="hotfixUdids" placeholder="UDID，英文逗号分隔，最多 4 个" value="${esc(task.udids)}">`)}</div>
+      ${field("后台重启", `<label class="hotfix-check"><input id="hotfixReboot" type="checkbox" ${task.reboot ? "checked" : ""}>切到后台后自动重启</label>`)}
+      <div class="span-2">${field("更新描述", `<textarea class="hotfix-input" id="hotfixDescription" rows="2">${esc(task.description)}</textarea>`)}</div>
+    </div>`;
 }
 
 function bindConfig() {
-  document.getElementById("hotfixGray").onchange = () => {
-    document.getElementById("hotfixGrayFields").hidden = document.getElementById("hotfixGray").value === "all";
+  const gray = document.getElementById("hotfixGray");
+  const syncGray = () => {
+    const hide = gray.value === "all";
+    document.getElementById("hotfixRatioField").hidden = hide;
+    document.getElementById("hotfixUdidField").hidden = hide;
   };
+  gray.onchange = syncGray;
   document.getElementById("hotfixMod").oninput = () => {
-    document.getElementById("hotfixRatioHint").textContent = `即 ${Number(document.getElementById("hotfixMod").value) / 100}% 的设备`;
+    const value = Number(document.getElementById("hotfixMod").value);
+    document.getElementById("hotfixRatioHint").textContent = Number.isFinite(value) ? `即 ${value / 100}%` : "";
   };
 }
 
@@ -289,50 +296,51 @@ function rowBases(row) {
 }
 
 function selectedBasesHtml(versions) {
-  if (!versions.length) return '<p class="hotfix-help">尚未选择</p>';
-  const chip = (version) => `<span class="hotfix-tag">${esc(version)} <button type="button" data-remove-base="${esc(version)}" aria-label="移除基准包 ${esc(version)}">×</button></span>`;
+  if (!versions.length) return '<span class="hotfix-empty">未选择</span>';
+  const chip = (version) => `<span class="hotfix-tag">${esc(version)} <button type="button" data-remove-base="${esc(version)}" aria-label="移除 ${esc(version)}">×</button></span>`;
   return versions.map((version) => `<input type="checkbox" name="base" value="${esc(version)}" checked hidden>`).join("")
-    + `<p class="hotfix-help">已选 ${versions.length} 个基准包</p>`
-    + `<div class="hotfix-tags">${versions.slice(0, 3).map(chip).join("")}</div>`
-    + (versions.length > 3 ? `<details class="hotfix-more"><summary>展开其余 ${versions.length - 3} 个</summary><div class="hotfix-tags">${versions.slice(3).map(chip).join("")}</div></details>` : "");
+    + `<div class="hotfix-tags">${versions.map(chip).join("")}</div>`;
 }
 
 function sourceRow(source = {}) {
   const key = source.key || ++nextSource;
-  return `<tr data-source="${key}">
-    <td class="source-index"></td>
-    <td><input class="hotfix-input" name="target" aria-label="目标版本名称" placeholder="例如 9.0.4" value="${esc(source.target || "")}"></td>
-    <td><input class="hotfix-input" name="url" aria-label="完整包地址" type="url" placeholder="https://…/完整包.apk" value="${esc(source.url || "")}"><p class="hotfix-help">填写客户端提供的完整 APK 地址</p></td>
-    <td><button class="btn-link" type="button" data-pick-bases>选择基准包</button><div class="selected-bases">${selectedBasesHtml(source.bases || [])}</div></td>
-    <td><button class="btn-link" type="button" data-remove-source="${key}">移除</button></td>
-  </tr>`;
+  return `<div class="hotfix-pack" data-source="${key}">
+    <div class="hotfix-pack-bar">
+      <span class="source-index"></span>
+      <button class="btn-link" type="button" data-remove-source="${key}">移除</button>
+    </div>
+    <div class="hotfix-pack-grid">
+      ${field("目标版本", `<input class="hotfix-input" name="target" aria-label="目标版本" placeholder="例如 9.0.4" value="${esc(source.target || "")}">`, true)}
+      ${field("完整包地址", `<input class="hotfix-input" name="url" aria-label="完整包地址" type="url" placeholder="https://…/完整包.apk" value="${esc(source.url || "")}">`, true)}
+    </div>
+    <div class="hotfix-bases-row">
+      <span>基准版本 <i class="req">*</i></span>
+      <button class="btn-ghost" type="button" data-pick-bases>选择</button>
+      <div class="selected-bases">${selectedBasesHtml(source.bases || [])}</div>
+    </div>
+  </div>`;
 }
 
 function refreshSourceSummary() {
-  const rows = [...document.querySelectorAll("#hotfixSourceRows tr")];
+  const rows = [...document.querySelectorAll("#hotfixSourceRows .hotfix-pack")];
   rows.forEach((row, index) => {
-    row.querySelector(".source-index").textContent = index + 1;
+    row.querySelector(".source-index").textContent = `完整包 ${index + 1}`;
     row.querySelector("[data-remove-source]").disabled = rows.length === 1;
   });
   const count = [...document.querySelectorAll('#hotfixSourceRows [name="base"]')].filter((item) => item.checked).length;
-  document.getElementById("hotfixSourceSummary").textContent = `共 ${rows.length} 份完整包，选择 ${count} 个基准包，将生成 ${count} 个补丁，并创建 ${count} 条版本历史。`;
+  document.getElementById("hotfixSourceSummary").textContent = count ? `${count} 个补丁` : "";
 }
 
 function newTask() {
   openDialog("create", "新增热更新任务");
   const defaults = { gray: "ratio", ratio: 10, wifi: false, udids: "", reboot: false, clear: 3, description: "" };
   hotfixDialogBody.innerHTML = `<form id="hotfixTaskForm" novalidate>
-    <div class="hotfix-section">任务信息</div>
     ${field("任务名称", '<input class="hotfix-input" id="hotfixTaskName" maxlength="80" placeholder="例如：9.0 / 9.1 登录修复">', true)}
-    ${field("所属应用", '<div class="hotfix-static">4399 游戏盒（com.m4399.gamecenter）</div>')}
-    <div class="hotfix-section"><span>完整包与基准包</span><button class="btn-link" type="button" id="hotfixAddSource">＋ 添加完整包</button></div>
-    <div class="panel"><table class="data-table hotfix-source-table"><thead><tr><th class="col-index">序号</th><th class="col-target">目标版本名称 <i class="req">*</i></th><th>完整包地址 <i class="req">*</i></th><th class="col-bases">适用基准版本 <i class="req">*</i></th><th class="col-remove">操作</th></tr></thead><tbody id="hotfixSourceRows">${sourceRow()}</tbody></table></div>
-    <p class="hotfix-help">点击「选择基准包」，在弹窗中搜索并勾选；支持跨页选择，确认后统一展示。每个基准包在同一任务中只能分配一次。</p>
-    <p class="hotfix-help" id="hotfixSourceSummary"></p>
+    <div class="hotfix-section"><span>完整包<span class="hotfix-count" id="hotfixSourceSummary"></span></span><button class="btn-link" type="button" id="hotfixAddSource">添加完整包</button></div>
+    <div id="hotfixSourceRows">${sourceRow()}</div>
     ${configFields(defaults)}
-    <div class="hotfix-alert">新增任务默认预览。全部补丁就绪后，可在「配置管理」中统一切换为上线。</div>
   </form>`;
-  setDialogFooter("同一任务中的所有补丁共用一份升级配置。", '<button class="btn-ghost" type="button" id="hotfixFillExample">填入双版本示例</button><button class="btn-ghost" type="button" id="hotfixCancelCreate">取消</button><button class="btn-primary" type="submit" form="hotfixTaskForm">提交任务</button>');
+  setDialogFooter("", '<button class="btn-ghost" type="button" id="hotfixCancelCreate">取消</button><button class="btn-primary" type="submit" form="hotfixTaskForm">提交任务</button>');
   document.getElementById("hotfixAddSource").onclick = () => {
     document.getElementById("hotfixSourceRows").insertAdjacentHTML("beforeend", sourceRow());
     refreshSourceSummary();
@@ -341,12 +349,12 @@ function newTask() {
   document.getElementById("hotfixSourceRows").onclick = (event) => {
     const picker = event.target.closest("[data-pick-bases]");
     if (picker) {
-      openBasePicker(picker.closest("tr"));
+      openBasePicker(picker.closest(".hotfix-pack"));
       return;
     }
     const removeBase = event.target.closest("[data-remove-base]");
     if (removeBase) {
-      const row = removeBase.closest("tr");
+      const row = removeBase.closest(".hotfix-pack");
       const remaining = rowBases(row).filter((version) => version !== removeBase.dataset.removeBase);
       row.querySelector(".selected-bases").innerHTML = selectedBasesHtml(remaining);
       refreshSourceSummary();
@@ -354,22 +362,9 @@ function newTask() {
     }
     const remove = event.target.closest("[data-remove-source]");
     if (remove && !remove.disabled) {
-      remove.closest("tr").remove();
+      remove.closest(".hotfix-pack").remove();
       refreshSourceSummary();
     }
-  };
-  document.getElementById("hotfixFillExample").onclick = () => {
-    document.getElementById("hotfixTaskName").value = "9.0 / 9.1 登录与首页修复";
-    document.getElementById("hotfixSourceRows").innerHTML = sourceRow({
-      target: "9.0.4",
-      url: "https://packages.example.com/4399Game_9.0.4.apk",
-      bases: ["9.0.1", "9.0.2", "9.0.3"],
-    }) + sourceRow({
-      target: "9.1.2",
-      url: "https://packages.example.com/4399Game_9.1.2.apk",
-      bases: ["9.1.0", "9.1.1"],
-    });
-    refreshSourceSummary();
   };
   document.getElementById("hotfixCancelCreate").onclick = closeDialog;
   document.getElementById("hotfixTaskForm").onsubmit = submitTask;
@@ -398,7 +393,7 @@ function submitTask(event) {
   const sources = [];
   const selected = new Set();
   const targets = new Set();
-  for (const [index, row] of [...document.querySelectorAll("#hotfixSourceRows tr")].entries()) {
+  for (const [index, row] of [...document.querySelectorAll("#hotfixSourceRows .hotfix-pack")].entries()) {
     const target = row.querySelector('[name="target"]').value.trim();
     const url = row.querySelector('[name="url"]').value.trim();
     const bases = [...row.querySelectorAll('[name="base"]:checked')].map((item) => item.value);
@@ -453,7 +448,7 @@ function submitTask(event) {
   listPage = 1;
   renderList();
   showDetail(id);
-  showToast(`任务已创建：${sources.length} 份完整包，将生成 ${childrenOf(task).length} 个补丁（模拟）`);
+  showToast(`已创建，将生成 ${childrenOf(task).length} 个补丁`);
 }
 
 function showDetail(id) {
@@ -470,18 +465,22 @@ function renderDetail() {
   const all = childrenOf(task);
   const ready = all.filter((child) => child.stage === 4).length;
   const failures = all.filter((child) => child.failed).length;
-  hotfixDialogBody.innerHTML = `<dl class="hotfix-meta"><dt>任务名称</dt><dd>${esc(task.name)}</dd><dt>处理进度</dt><dd>${statusTag(task)}　${ready} / ${all.length} 个补丁就绪，${failures} 个失败</dd></dl>
-    <div class="hotfix-section"><span>补丁明细（${task.sources.length} 份完整包 / ${all.length} 个补丁）</span><label class="hotfix-check"><input type="checkbox" id="hotfixSelectFailed" ${failures ? "" : "disabled"}>全选失败项</label></div>
-    ${task.sources.map((source, index) => `<div class="hotfix-block-title">完整包 ${index + 1}：目标版本 ${esc(source.target)}</div><div class="hotfix-url">来源地址：${esc(source.url)}</div><div class="panel"><table class="data-table"><thead><tr><th>选择</th><th>适用基准版本</th><th>目标版本</th><th>当前步骤</th><th>应用解析 ID</th><th>版本历史 ID</th><th>版本状态 / 处理结果</th></tr></thead><tbody>${source.children.map((child) => `<tr>
-      <td><input type="checkbox" class="retry-item" aria-label="选择 ${esc(child.base)} 的失败补丁" data-key="${retryKey(source, child)}" ${child.failed ? "" : "disabled"} ${child.failed && retrySelection.has(retryKey(source, child)) ? "checked" : ""}></td>
-      <td>${esc(child.base)}</td><td>${esc(source.target)}</td>
+  hotfixDialogBody.innerHTML = `<div class="hotfix-summary">
+      <div>
+        <div class="hotfix-summary-name">${esc(task.name)}</div>
+        <div class="hotfix-summary-meta">${statusTag(task)}<span>${ready} / ${all.length}${failures ? ` · ${failures} 个失败` : ""}</span></div>
+      </div>
+      <label class="hotfix-check"><input type="checkbox" id="hotfixSelectFailed" ${failures ? "" : "disabled"}>全选失败</label>
+    </div>
+    ${task.sources.map((source) => `<div class="hotfix-block"><div class="hotfix-block-title"><span>${esc(source.target)}</span><span class="hotfix-url" title="${esc(source.url)}">${esc(source.url)}</span></div><div class="panel"><table class="data-table hotfix-detail-table"><thead><tr><th>选择</th><th>基准版本</th><th>步骤</th><th>解析 ID</th><th>版本 ID</th><th>状态</th></tr></thead><tbody>${source.children.map((child) => `<tr>
+      <td><input type="checkbox" class="retry-item" aria-label="选择 ${esc(child.base)}" data-key="${retryKey(source, child)}" ${child.failed ? "" : "disabled"} ${child.failed && retrySelection.has(retryKey(source, child)) ? "checked" : ""}></td>
+      <td>${esc(child.base)}</td>
       <td>${child.failed ? '<span class="hotfix-error">上传失败</span>' : child.stage === 4 ? "已完成" : stageNames[child.stage]}</td>
       <td>${child.downloadId || "—"}</td><td>${child.versionId || "—"}</td>
-      <td>${child.failed ? '<span class="hotfix-error">上传超时，可重试（模拟）</span>' : child.stage === 4 ? (task.state === "published" ? "上线" : "预览") : "处理中"}</td>
-    </tr>`).join("")}</tbody></table></div>`).join("")}
-    <p class="hotfix-help">仅失败项可以勾选。重试从失败步骤继续，成功的补丁和关联版本记录保留。</p>`;
-  setDialogFooter("上线状态与灰度条件请在列表的「配置管理」中维护。",
-    `${task.state === "running" ? '<button class="btn-ghost" type="button" id="hotfixAdvance">刷新进度（模拟）</button>' : ""}<button class="btn-hotfix" type="button" id="hotfixRetry" disabled>重试所选失败项（0）</button><button class="btn-ghost" type="button" id="hotfixCloseDetail">关闭</button>`);
+      <td>${child.failed ? '<span class="hotfix-error">失败</span>' : child.stage === 4 ? (task.state === "published" ? "上线" : "预览") : "处理中"}</td>
+    </tr>`).join("")}</tbody></table></div></div>`).join("")}`;
+  setDialogFooter("",
+    `${task.state === "running" ? '<button class="btn-ghost" type="button" id="hotfixAdvance">刷新进度</button>' : ""}<button class="btn-hotfix" type="button" id="hotfixRetry" disabled>重试</button><button class="btn-ghost" type="button" id="hotfixCloseDetail">关闭</button>`);
   document.getElementById("hotfixCloseDetail").onclick = closeDialog;
   const advance = document.getElementById("hotfixAdvance");
   if (advance) {
@@ -516,7 +515,7 @@ function updateRetryControls() {
   const retry = document.getElementById("hotfixRetry");
   const selectFailed = document.getElementById("hotfixSelectFailed");
   retry.disabled = selected.length === 0;
-  retry.textContent = `重试所选失败项（${selected.length}）`;
+  retry.textContent = selected.length ? `重试 ${selected.length} 项` : "重试";
   selectFailed.checked = eligible.length > 0 && selected.length === eligible.length;
   selectFailed.indeterminate = selected.length > 0 && selected.length < eligible.length;
 }
@@ -535,7 +534,7 @@ function retrySelected() {
   retrySelection.clear();
   renderList();
   renderDetail();
-  showToast(`已重试所选 ${count} 个失败补丁，其余结果保留（模拟）`);
+  showToast(`已重试 ${count} 个补丁`);
 }
 
 function editConfig(id) {
@@ -544,12 +543,18 @@ function editConfig(id) {
   openDialog("config", `配置管理 - 任务 ${id}`);
   const ready = childrenOf(task).every((child) => child.stage === 4 && !child.failed);
   hotfixDialogBody.innerHTML = `<form id="hotfixConfigForm" novalidate>
-    <div class="hotfix-section">任务配置</div>
-    ${field("任务名称", `<div class="hotfix-static">${esc(task.name)}</div>`)}
-    ${field("状态", `<select id="hotfixRelease"><option value="preview" ${task.state !== "published" ? "selected" : ""}>预览</option><option value="online" ${task.state === "published" ? "selected" : ""} ${ready ? "" : "disabled"}>上线</option></select><p class="hotfix-help">${ready ? "保存后将统一同步所有关联版本的状态；切回预览后停止下发。" : "补丁尚未全部就绪，当前仅可预览；其他配置可先保存，后续生成的版本会沿用。"}</p>`)}
+    <div class="hotfix-summary">
+      <div>
+        <div class="hotfix-summary-name">${esc(task.name)}</div>
+        <div class="hotfix-summary-meta">任务 ${task.id}</div>
+      </div>
+    </div>
+    <div class="hotfix-status">
+      ${field("发布状态", `<select id="hotfixRelease"><option value="preview" ${task.state !== "published" ? "selected" : ""}>预览</option><option value="online" ${task.state === "published" ? "selected" : ""} ${ready ? "" : "disabled"}>上线</option></select>${ready ? "" : '<p class="hotfix-help">补丁未全部就绪，暂不能上线</p>'}`)}
+    </div>
     ${configFields(task)}
   </form>`;
-  setDialogFooter(`统一维护 ${task.sources.length} 份完整包对应的 ${childrenOf(task).length} 个补丁配置。`, '<button class="btn-ghost" type="button" id="hotfixCancelConfig">取消</button><button class="btn-primary" type="submit" form="hotfixConfigForm">保存并同步</button>');
+  setDialogFooter("", '<button class="btn-ghost" type="button" id="hotfixCancelConfig">取消</button><button class="btn-primary" type="submit" form="hotfixConfigForm">保存</button>');
   bindConfig();
   document.getElementById("hotfixCancelConfig").onclick = closeDialog;
   document.getElementById("hotfixConfigForm").onsubmit = (event) => {
@@ -566,7 +571,7 @@ function editConfig(id) {
     else if (task.state === "published") task.state = "ready";
     renderList();
     closeDialog();
-    showToast(`配置已统一保存，状态：${online ? "上线" : "预览"}（模拟）`);
+    showToast(online ? "已保存，状态为上线" : "已保存，状态为预览");
   };
 }
 
@@ -581,12 +586,12 @@ function advanceTask(task) {
   const pending = childrenOf(task).filter((child) => child.stage < 4);
   if (!pending.length) {
     task.state = "ready";
-    showToast(`任务 ${task.id} 全部就绪，版本保持预览；可在配置管理中上线（模拟）`);
+    showToast(`任务 ${task.id} 已全部就绪`);
   } else if (pending.every((child) => child.failed)) task.state = "failed";
 }
 
 function occupiedBases() {
-  return new Set([...document.querySelectorAll("#hotfixSourceRows tr")].filter((row) => row !== pickerRow).flatMap(rowBases));
+  return new Set([...document.querySelectorAll("#hotfixSourceRows .hotfix-pack")].filter((row) => row !== pickerRow).flatMap(rowBases));
 }
 
 function baseUnavailable(item) {
@@ -611,8 +616,7 @@ function openBasePicker(row) {
       <label>包类型<select name="kind"><option value="full">完整基准包</option><option value="">全部</option></select></label>
       <div class="hotfix-search-actions"><button class="btn-primary" type="submit">搜索</button><button class="btn-ghost" type="button" id="hotfixPickerReset">重置</button></div>
     </form>
-    <p class="hotfix-help">只可选择已就绪的完整基准包；热修复包不可选择。勾选支持跨页保留，确认后回填表单，取消不修改原选择。</p>
-    <div class="panel"><table class="data-table hotfix-picker-table"><thead><tr><th><input type="checkbox" id="hotfixSelectPickerPage" aria-label="选择当前页可用基准包"></th><th>主版本</th><th>具体版本号</th><th>插件版本号</th><th>主插件版本号</th><th>重构代码</th><th>发布人</th><th>发布日期</th><th>发布渠道</th><th>发布说明 / 可选状态</th></tr></thead><tbody id="hotfixPickerRows"></tbody></table></div>
+    <div class="panel"><table class="data-table hotfix-picker-table"><thead><tr><th><input type="checkbox" id="hotfixSelectPickerPage" aria-label="选择当前页"></th><th>主版本</th><th>版本号</th><th>发布日期</th><th>渠道</th><th>说明</th></tr></thead><tbody id="hotfixPickerRows"></tbody></table></div>
     <div class="hotfix-pager"><span id="hotfixPickerResult"></span><div class="hotfix-pages" id="hotfixPickerPages"></div></div>`;
   setInert(hotfixDialog, true);
   hotfixPicker.hidden = false;
@@ -667,9 +671,9 @@ function renderBasePicker() {
   document.getElementById("hotfixPickerRows").innerHTML = list.slice((pickerPage - 1) * 8, pickerPage * 8).map((item) => {
     const reason = baseUnavailable(item);
     const checked = pickerSelection.has(item.version);
-    return `<tr class="${reason ? "is-unavailable" : ""}"><td><input type="checkbox" class="picker-check" value="${esc(item.version)}" aria-label="选择基准包 ${esc(item.version)}" ${checked ? "checked" : ""} ${reason && !checked ? "disabled" : ""}></td><td>${esc(item.main)}</td><td>${esc(item.version)}</td><td>${item.plugin}</td><td>${item.hostPlugin}</td><td>${esc(item.fusion)}</td><td>${esc(item.publisher)}</td><td>${esc(item.date)}</td><td>${esc(item.channel)}</td><td>${esc(item.note)}${reason ? `<div class="hotfix-error">${esc(reason)}</div>` : ""}</td></tr>`;
-  }).join("") || '<tr><td class="empty" colspan="10">暂无匹配的基准包</td></tr>';
-  document.getElementById("hotfixPickerResult").textContent = `共 ${list.length} 条，第 ${pickerPage} / ${pages} 页，每页 8 条`;
+    return `<tr class="${reason ? "is-unavailable" : ""}"><td><input type="checkbox" class="picker-check" value="${esc(item.version)}" aria-label="选择 ${esc(item.version)}" ${checked ? "checked" : ""} ${reason && !checked ? "disabled" : ""}></td><td>${esc(item.main)}</td><td>${esc(item.version)}</td><td>${esc(item.date)}</td><td>${esc(item.channel)}</td><td>${reason ? `<span class="hotfix-error">${esc(reason)}</span>` : esc(item.note)}</td></tr>`;
+  }).join("") || '<tr><td class="empty" colspan="6">暂无匹配的基准包</td></tr>';
+  document.getElementById("hotfixPickerResult").textContent = `共 ${list.length} 条`;
   document.getElementById("hotfixPickerPages").innerHTML = `<button type="button" data-picker-page="${pickerPage - 1}" ${pickerPage === 1 ? "disabled" : ""}>上一页</button>`
     + Array.from({ length: pages }, (_, index) => `<button type="button" data-picker-page="${index + 1}" class="${pickerPage === index + 1 ? "is-active" : ""}">${index + 1}</button>`).join("")
     + `<button type="button" data-picker-page="${pickerPage + 1}" ${pickerPage === pages ? "disabled" : ""}>下一页</button>`;
@@ -677,7 +681,7 @@ function renderBasePicker() {
 }
 
 function updatePickerCount() {
-  hotfixPickerCount.textContent = `已选择 ${pickerSelection.size} 个基准包（跨页保留）`;
+  hotfixPickerCount.textContent = `已选 ${pickerSelection.size} 个`;
   const available = [...document.querySelectorAll(".picker-check:not(:disabled)")];
   const count = available.filter((element) => element.checked).length;
   const selectPage = document.getElementById("hotfixSelectPickerPage");
@@ -696,7 +700,7 @@ document.getElementById("hotfixClose").addEventListener("click", closeHotfix);
 document.getElementById("hotfixRefresh").addEventListener("click", () => {
   tasks.filter((task) => task.state === "running").forEach(advanceTask);
   renderList();
-  showToast("列表已手动刷新（模拟）");
+  showToast("已刷新");
 });
 document.getElementById("hotfixAdd").addEventListener("click", newTask);
 hotfixMask.addEventListener("click", (event) => {

@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>管理后台</title>
-  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="styles.css?v=7" />
 </head>
 <body>
   <div class="layout">
@@ -20,6 +20,7 @@
           </button>
           <div class="submenu" id="releaseSubmenu">
             <button class="submenu-item is-active" type="button" data-page="version">游戏盒版本</button>
+            <button class="submenu-item" type="button" data-page="update">游戏盒版本更新内容</button>
             <button class="submenu-item" type="button" data-page="plugin">游戏盒插件</button>
           </div>
         </div>
@@ -30,6 +31,7 @@
       <header class="topbar">
         <h1 class="title" id="pageTitle">游戏盒版本</h1>
         <div class="topbar-actions">
+          <button class="btn-beta" type="button" id="betaBtn">发布公测</button>
           <button class="btn-hotfix" type="button" id="hotfixBtn">发布热修复包</button>
           <button class="btn-primary" type="button" id="addBtn">新增</button>
         </div>
@@ -62,6 +64,27 @@
               </tr>
             </thead>
             <tbody id="versionTableBody"></tbody>
+          </table>
+        </section>
+        <section class="panel" id="updatePage" hidden>
+          <table class="data-table">
+            <colgroup>
+              <col class="col-update-major" />
+              <col class="col-update-created" />
+              <col class="col-update-updated" />
+              <col class="col-update-mode" />
+              <col class="col-update-action" />
+            </colgroup>
+            <thead>
+              <tr>
+                <th>主版本</th>
+                <th>创建时间</th>
+                <th>更新时间</th>
+                <th>模式</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody id="updateTableBody"></tbody>
           </table>
         </section>
         <section id="pluginPage" hidden>
@@ -169,6 +192,245 @@
     </div>
   </div>
 
+  <div class="modal-mask" id="betaListMask" hidden>
+    <div class="modal hotfix-shell" role="dialog" aria-modal="true" aria-labelledby="betaListTitle">
+      <header class="hotfix-head">
+        <h2 class="modal-title" id="betaListTitle">公测列表</h2>
+        <div class="topbar-actions">
+          <button class="btn-beta" type="button" id="betaAddBtn">新增公测</button>
+          <button class="btn-ghost" type="button" id="betaListClose">关闭</button>
+        </div>
+      </header>
+      <div class="hotfix-body">
+        <div class="panel">
+          <table class="data-table">
+            <colgroup>
+              <col class="col-beta-name" />
+              <col class="col-beta-version" />
+              <col class="col-beta-size" />
+              <col class="col-beta-period" />
+              <col class="col-beta-updated" />
+              <col class="col-beta-action" />
+            </colgroup>
+            <thead>
+              <tr>
+                <th>应用名称</th>
+                <th>版本号</th>
+                <th>包体大小</th>
+                <th>开始与结束时间</th>
+                <th>更新时间</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody id="betaTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-mask" id="betaModal" hidden>
+    <div class="modal beta-modal" role="dialog" aria-labelledby="betaModalTitle" aria-modal="true">
+      <h2 class="modal-title" id="betaModalTitle">发布公测</h2>
+      <form id="betaForm" novalidate>
+        <div id="betaConfig">
+        <label class="field">
+          <span>游戏盒版本</span>
+          <select name="versionId" required>
+            <option value="" selected disabled>请选择游戏盒版本</option>
+          </select>
+        </label>
+        <label class="field">
+          <span>弹窗标题</span>
+          <input type="text" name="popupTitle" placeholder="选择版本后自动生成，可修改" />
+        </label>
+        <label class="field">
+          <span>应用名称</span>
+          <input type="text" name="appName" placeholder="选择版本后自动生成，可修改" />
+        </label>
+        <div class="field-row">
+          <label class="field">
+            <span>开始时间</span>
+            <input type="datetime-local" name="start" required />
+          </label>
+          <label class="field">
+            <span>结束时间</span>
+            <input type="datetime-local" name="end" required />
+          </label>
+        </div>
+        <label class="field">
+          <span>一句话介绍</span>
+          <input type="text" name="intro" placeholder="请输入一句话介绍" required />
+        </label>
+        <div class="field beta-switch">
+          <span>入口开放范围</span>
+          <div class="beta-switch-options" role="radiogroup" aria-label="入口开放范围">
+            <label>
+              <input type="radio" name="entryScope" value="all" checked />
+              <span>全量用户</span>
+            </label>
+            <label>
+              <input type="radio" name="entryScope" value="selected" />
+              <span>仅圈选用户</span>
+            </label>
+          </div>
+        </div>
+        <div class="field beta-switch">
+          <span>开启首页推送弹窗</span>
+          <div class="beta-switch-options" role="radiogroup" aria-label="开启首页推送弹窗">
+            <label>
+              <input type="radio" name="homePopup" value="yes" checked />
+              <span>是（仅圈选用户）</span>
+            </label>
+            <label>
+              <input type="radio" name="homePopup" value="no" />
+              <span>否</span>
+            </label>
+          </div>
+        </div>
+        <div class="beta-asset">
+          <label for="betaEntryCopy">功能入口文案</label>
+          <input id="betaEntryCopy" name="entryCopy" type="text" />
+        </div>
+        <div class="beta-asset">
+          <label for="betaEntryBg">功能入口文案背景</label>
+          <div>
+            <div class="beta-upload-line">
+              <input id="betaEntryBg" name="entryBg" type="text" />
+              <button class="btn-link" type="button" data-upload="entryBg">上传</button>
+              <input type="file" accept="image/*" hidden data-file="entryBg" />
+            </div>
+            <img class="beta-upload-preview" data-preview="entryBg" alt="" hidden />
+          </div>
+        </div>
+        <div class="beta-asset">
+          <label for="betaEntryIcon">功能入口文案图标</label>
+          <div>
+            <div class="beta-upload-line">
+              <input id="betaEntryIcon" name="entryIcon" type="text" />
+              <button class="btn-link" type="button" data-upload="entryIcon">上传</button>
+              <input type="file" accept="image/*" hidden data-file="entryIcon" />
+            </div>
+            <img class="beta-upload-preview" data-preview="entryIcon" alt="" hidden />
+          </div>
+        </div>
+        <button class="beta-crowd-toggle" type="button" id="betaCrowdAdd">+人群定制</button>
+        <section class="beta-crowd-section" id="betaCrowdUpdates" hidden aria-label="更新内容(人群定制)">
+          <div class="beta-updates is-label">
+            <div class="beta-updates-title"><i>*</i>更新内容(人群定制):</div>
+            <p class="beta-updates-meta"><span class="is-required">必填选项(*)</span></p>
+          </div>
+          <div id="betaCrowdList"></div>
+        </section>
+        </div>
+        <section class="beta-audience" id="betaAudience" aria-label="推送人群">
+          <h3 class="beta-audience-title">推送人群</h3>
+          <div class="beta-audience-crowd">
+            <label for="betaCrowd">人群</label>
+            <div>
+              <input id="betaCrowd" type="text" name="crowd" placeholder="请输入人群id，多个用,隔开" />
+              <span class="beta-crowd-note">用户中心后台生成的人群id，多个以,隔开，变更后请到“运营其他-共用模块-大数据用户分群管理菜单”后台关注人群是否拉取完成</span>
+            </div>
+          </div>
+          <p class="beta-audience-formula">比例*用户数=预计用户数</p>
+          <div class="beta-audience-row">
+            <label for="betaLowPercent">低活跃用户百分比</label>
+            <input id="betaLowPercent" name="lowPercent" type="number" min="0" max="100" step="1" value="20" inputmode="numeric" />
+            <span class="beta-op" aria-hidden="true">*</span>
+            <input type="text" value="10578831" readonly tabindex="-1" aria-label="低活跃用户数" />
+            <span class="beta-op" aria-hidden="true">=</span>
+            <input type="text" name="lowEstimate" readonly tabindex="-1" aria-label="低活跃预计用户数" />
+            <span class="beta-range">月活: 0-4天</span>
+          </div>
+          <div class="beta-audience-row">
+            <label for="betaMidPercent">中活跃用户百分比</label>
+            <input id="betaMidPercent" name="midPercent" type="number" min="0" max="100" step="1" value="20" inputmode="numeric" />
+            <span class="beta-op" aria-hidden="true">*</span>
+            <input type="text" value="1417325" readonly tabindex="-1" aria-label="中活跃用户数" />
+            <span class="beta-op" aria-hidden="true">=</span>
+            <input type="text" name="midEstimate" readonly tabindex="-1" aria-label="中活跃预计用户数" />
+            <span class="beta-range">月活: 5-10天</span>
+          </div>
+          <div class="beta-audience-row">
+            <label for="betaHighPercent">高活跃用户百分比</label>
+            <input id="betaHighPercent" name="highPercent" type="number" min="0" max="100" step="1" value="20" inputmode="numeric" />
+            <span class="beta-op" aria-hidden="true">*</span>
+            <input type="text" value="577179" readonly tabindex="-1" aria-label="高活跃用户数" />
+            <span class="beta-op" aria-hidden="true">=</span>
+            <input type="text" name="highEstimate" readonly tabindex="-1" aria-label="高活跃预计用户数" />
+            <span class="beta-range">月活: 11-20天</span>
+          </div>
+          <div class="beta-audience-row">
+            <label for="betaUltraPercent">超高活跃用户百分比</label>
+            <input id="betaUltraPercent" name="ultraPercent" type="number" min="0" max="100" step="1" value="20" inputmode="numeric" />
+            <span class="beta-op" aria-hidden="true">*</span>
+            <input type="text" value="304613" readonly tabindex="-1" aria-label="超高活跃用户数" />
+            <span class="beta-op" aria-hidden="true">=</span>
+            <input type="text" name="ultraEstimate" readonly tabindex="-1" aria-label="超高活跃预计用户数" />
+            <span class="beta-range">月活: ≥20天</span>
+          </div>
+          <label class="field">
+            <span>指定版本</span>
+            <input type="text" name="targetVersions" placeholder="例如5.4.1.29 多个用,间隔" />
+          </label>
+        </section>
+        <span class="hint" id="betaHint" hidden></span>
+        <div class="modal-actions">
+          <button class="btn-ghost" type="button" id="betaCancelBtn">取消</button>
+          <button class="btn-beta" type="submit">确定</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal-mask" id="updateModal" hidden>
+    <div class="modal beta-modal" role="dialog" aria-labelledby="updateModalTitle" aria-modal="true">
+      <h2 class="modal-title" id="updateModalTitle">新增更新内容</h2>
+      <form id="updateForm" novalidate>
+        <label class="field">
+          <span>主版本</span>
+          <input type="text" name="major" placeholder="例如 V9.7" required />
+        </label>
+        <div class="field-row">
+          <label class="field">
+            <span>创建时间</span>
+            <input type="datetime-local" name="createdAt" required />
+          </label>
+          <label class="field">
+            <span>更新时间</span>
+            <input type="datetime-local" name="updatedAt" required />
+          </label>
+        </div>
+        <div class="field beta-switch">
+          <span>模式</span>
+          <div class="beta-switch-options" role="radiogroup" aria-label="模式">
+            <label>
+              <input type="radio" name="mode" value="preview" checked />
+              <span>预览</span>
+            </label>
+            <label>
+              <input type="radio" name="mode" value="online" />
+              <span>上线</span>
+            </label>
+          </div>
+        </div>
+        <section class="beta-updates" aria-label="图文">
+          <div class="beta-updates-title"><i>*</i>图文</div>
+          <p class="beta-updates-meta">
+            <span class="is-required">必填选项(*)</span>
+            <span class="beta-updates-warn"><em>注意</em>上传的图片仅针对V6.0版本及以上盒子实验室生效！</span>
+          </p>
+          <div class="beta-update-sheet" id="betaDefaultSheet"></div>
+        </section>
+        <span class="hint" id="updateHint" hidden></span>
+        <div class="modal-actions">
+          <button class="btn-ghost" type="button" id="updateCancelBtn">取消</button>
+          <button class="btn-primary" type="submit">确定</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <div class="modal-mask" id="confirmModal" hidden>
     <div class="modal confirm-modal" role="dialog" aria-labelledby="confirmTitle" aria-modal="true">
       <h2 class="modal-title" id="confirmTitle">确认删除</h2>
@@ -213,14 +475,23 @@
         </form>
         <div class="panel">
           <table class="data-table hotfix-table">
+            <colgroup>
+              <col class="hotfix-col-id" />
+              <col class="hotfix-col-name" />
+              <col />
+              <col class="hotfix-col-progress" />
+              <col class="hotfix-col-status" />
+              <col class="hotfix-col-time" />
+              <col class="hotfix-col-ops" />
+            </colgroup>
             <thead>
               <tr>
                 <th>ID</th>
                 <th>任务名称</th>
-                <th>完整包 / 适用基准版本</th>
-                <th>补丁进度</th>
-                <th>处理状态</th>
-                <th>管理员 / 创建时间</th>
+                <th>完整包 / 基准版本</th>
+                <th>进度</th>
+                <th>状态</th>
+                <th>创建时间</th>
                 <th>操作</th>
               </tr>
             </thead>
@@ -239,7 +510,6 @@
             条
           </label>
         </div>
-        <p class="hotfix-note">演示页面不自动刷新。点击「刷新列表」或详情中的「刷新进度」推进模拟处理。数据仅保留在当前页面，浏览器刷新后重置。</p>
       </div>
     </div>
   </div>
@@ -271,8 +541,9 @@
   </div>
 
   <div class="hotfix-toast" id="hotfixToast" role="status" hidden></div>
+  <div class="hotfix-toast" id="betaToast" role="status" hidden></div>
 
-  <script src="app.js"></script>
-  <script src="hotfix.js"></script>
+  <script src="app.js?v=7"></script>
+  <script src="hotfix.js?v=7"></script>
 </body>
 </html>
