@@ -962,14 +962,6 @@ function showUpdateHint(message) {
   updateHint.hidden = !message;
 }
 
-function toDatetimeLocal(value) {
-  return String(value || "").replace(" ", "T").slice(0, 16);
-}
-
-function fromDatetimeLocal(value) {
-  return value.replace("T", " ");
-}
-
 function renderUpdateList() {
   if (updateContents.length === 0) {
     updateTableBody.innerHTML = '<tr><td class="empty" colspan="5">暂无更新内容</td></tr>';
@@ -993,20 +985,15 @@ function renderUpdateList() {
 function openUpdateModal(record) {
   updateForm.reset();
   showUpdateHint("");
-  const now = toDatetimeLocal(betaStamp());
   if (record) {
     editingUpdateId = record.id;
     updateModalTitle.textContent = "编辑更新内容";
     updateForm.elements.major.value = record.major;
-    updateForm.elements.createdAt.value = toDatetimeLocal(record.createdAt);
-    updateForm.elements.updatedAt.value = toDatetimeLocal(record.updatedAt);
     updateForm.elements.mode.value = record.mode === "online" ? "online" : "preview";
     resetDefaultUpdates({ updates: record.items });
   } else {
     editingUpdateId = null;
     updateModalTitle.textContent = "新增更新内容";
-    updateForm.elements.createdAt.value = now;
-    updateForm.elements.updatedAt.value = now;
     updateForm.elements.mode.value = "preview";
     resetDefaultUpdates(null);
   }
@@ -1022,39 +1009,36 @@ function closeUpdateModal() {
 
 function saveUpdateContent() {
   const major = updateForm.elements.major.value.trim();
-  const createdAt = updateForm.elements.createdAt.value;
-  const updatedAt = updateForm.elements.updatedAt.value;
   const mode = updateForm.elements.mode.value === "online" ? "online" : "preview";
   if (!major) {
     showUpdateHint("请填写主版本");
     updateForm.elements.major.focus();
     return;
   }
-  if (!createdAt || !updatedAt) {
-    showUpdateHint("请填写创建时间和更新时间");
-    updateForm.elements[createdAt ? "updatedAt" : "createdAt"].focus();
-    return;
-  }
-  if (updatedAt < createdAt) {
-    showUpdateHint("更新时间不能早于创建时间");
-    updateForm.elements.updatedAt.focus();
-    return;
-  }
   const items = readDefaultUpdates();
   if (!items) return;
-  const record = {
-    major,
-    createdAt: fromDatetimeLocal(createdAt),
-    updatedAt: fromDatetimeLocal(updatedAt),
-    mode,
-    items,
-  };
+  const now = betaStamp();
   if (editingUpdateId) {
     const index = updateContents.findIndex((item) => item.id === editingUpdateId);
-    if (index >= 0) updateContents[index] = { ...updateContents[index], ...record };
+    if (index >= 0) {
+      updateContents[index] = {
+        ...updateContents[index],
+        major,
+        mode,
+        items,
+        updatedAt: now,
+      };
+    }
     showBetaToast("已保存更新内容");
   } else {
-    updateContents.unshift({ id: nextUpdateId, ...record });
+    updateContents.unshift({
+      id: nextUpdateId,
+      major,
+      createdAt: now,
+      updatedAt: now,
+      mode,
+      items,
+    });
     nextUpdateId += 1;
     showBetaToast(`已新增更新内容：${major}`);
   }
