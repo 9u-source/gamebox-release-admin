@@ -353,8 +353,11 @@ let pendingDeleteId = null;
 let pendingDeleteTarget = null;
 let currentPage = "version";
 let nextBetaId = 5;
+let nextInternalId = 3;
 let betaMode = "create";
 let editingBetaId = null;
+let editingInternalId = null;
+let editingInternalRow = null;
 let editingUpdateId = null;
 let nextUpdateId = 3;
 
@@ -388,6 +391,56 @@ const betaReleases = [
   { id: 3, versionId: 3, popupTitle: "V9.6游戏盒公测活动", appName: "4399游戏盒V9.6", version: "9.6.0.8", size: "172.3 MB", downloadLink: "https://dlstest.img4399.com/redirect/ftp/client/appftp/9.6/tinker/9.6.0.8/release_pub/4399Game_9.6.0.8.2360.apk", publishStatus: "preview", start: "2026-09-12 09:30", end: "2026-10-12 23:59", intro: "内测包，新增消息中心", entryScope: "all", homePopup: "yes", crowd: "96beta", lowPercent: 20, midPercent: 20, highPercent: 20, ultraPercent: 20, targetVersions: "", updatedAt: "2026-09-15 11:08" },
   { id: 4, versionId: 4, popupTitle: "V9.5游戏盒公测活动", appName: "4399游戏盒V9.5", version: "9.5.2.4", size: "165.1 MB", downloadLink: "https://dlstest.img4399.com/redirect/ftp/client/appftp/9.5/tinker/9.5.2.4/release_pub/4399Game_9.5.2.4.2291.apk", publishStatus: "published", start: "2026-08-18 10:00", end: "2026-09-18 23:59", intro: "稳定版功能回归", entryScope: "all", homePopup: "yes", crowd: "95gongce", lowPercent: 25, midPercent: 25, highPercent: 25, ultraPercent: 25, targetVersions: "5.4.1.29,9.5.2.4", updatedAt: "2026-08-18 14:15" },
 ];
+
+const internalChannels = [
+  "a4399",
+  "youxi4399",
+  "wap4399",
+  "gongce4399",
+  "shouyou4399",
+  "neibu4399",
+  "yuangong4399",
+  "ceshi4399",
+  "yunying4399",
+  "qudao4399",
+];
+
+const internalReleases = [
+  {
+    id: 1,
+    versionId: 1,
+    appName: "4399游戏盒V9.7",
+    version: "9.7.0.30",
+    channelMode: "all",
+    channels: "",
+    updatedAt: "2026-10-21 15:40",
+    channelStates: {
+      a4399: { publishStatus: "preview", updateResult: "success" },
+      youxi4399: { publishStatus: "preview", updateResult: "success" },
+      wap4399: { publishStatus: "published", updateResult: "failed" },
+      gongce4399: { publishStatus: "published", updateResult: "failed" },
+      shouyou4399: { publishStatus: "preview", updateResult: "success" },
+      neibu4399: { publishStatus: "published", updateResult: "failed" },
+      yuangong4399: { publishStatus: "published", updateResult: "failed" },
+      ceshi4399: { publishStatus: "preview", updateResult: "success" },
+      yunying4399: { publishStatus: "preview", updateResult: "success" },
+      qudao4399: { publishStatus: "published", updateResult: "failed" },
+    },
+  },
+  {
+    id: 2,
+    versionId: 3,
+    appName: "4399游戏盒V9.6",
+    version: "9.6.0.8",
+    channelMode: "custom",
+    channels: "youxi4399\nwap4399",
+    updatedAt: "2026-09-12 11:20",
+    channelStates: {
+      youxi4399: { publishStatus: "preview", updateResult: "success" },
+      wap4399: { publishStatus: "published", updateResult: "failed" },
+    },
+  },
+];
 let activePluginType = PLUGIN_TYPES[0];
 const betaPopupWhitelist = { udids: [], crowds: [] };
 
@@ -415,6 +468,46 @@ const betaWhitelistCancel = document.getElementById("betaWhitelistCancel");
 const betaAddBtn = document.getElementById("betaAddBtn");
 const betaTableBody = document.getElementById("betaTableBody");
 const betaBtn = document.getElementById("betaBtn");
+const internalBtn = document.getElementById("internalBtn");
+const internalListMask = document.getElementById("internalListMask");
+const internalListClose = document.getElementById("internalListClose");
+const internalAddBtn = document.getElementById("internalAddBtn");
+const internalRecordBtn = document.getElementById("internalRecordBtn");
+const internalRecordMask = document.getElementById("internalRecordMask");
+const internalRecordCancel = document.getElementById("internalRecordCancel");
+const internalRecordSave = document.getElementById("internalRecordSave");
+const internalRecordVersion = document.getElementById("internalRecordVersion");
+const internalCatalogBtn = document.getElementById("internalCatalogBtn");
+const internalBatchBtn = document.getElementById("internalBatchBtn");
+const internalSuccessCount = document.getElementById("internalSuccessCount");
+const internalFailedCount = document.getElementById("internalFailedCount");
+const internalRetryBtn = document.getElementById("internalRetryBtn");
+const internalFilterChannel = document.getElementById("internalFilterChannel");
+const internalFilterStatus = document.getElementById("internalFilterStatus");
+const internalFilterResult = document.getElementById("internalFilterResult");
+const internalFilterSearch = document.getElementById("internalFilterSearch");
+const internalSelectAll = document.getElementById("internalSelectAll");
+let internalAppliedFilters = { channel: "", status: "", result: "" };
+let internalSearchActive = false;
+const internalSelected = new Set();
+const internalCatalogMask = document.getElementById("internalCatalogMask");
+const internalCatalogList = document.getElementById("internalCatalogList");
+const internalCatalogAdd = document.getElementById("internalCatalogAdd");
+const internalCatalogHint = document.getElementById("internalCatalogHint");
+const internalCatalogCancel = document.getElementById("internalCatalogCancel");
+const internalCatalogSave = document.getElementById("internalCatalogSave");
+const internalTableBody = document.getElementById("internalTableBody");
+const internalModal = document.getElementById("internalModal");
+const internalModalTitle = document.getElementById("internalModalTitle");
+const internalForm = document.getElementById("internalForm");
+const internalCancelBtn = document.getElementById("internalCancelBtn");
+const internalHint = document.getElementById("internalHint");
+const internalChannelField = document.getElementById("internalChannelField");
+const internalContentSelect = document.getElementById("internalContentSelect");
+const internalContentEditor = document.getElementById("internalContentEditor");
+const internalContentHint = document.getElementById("internalContentHint");
+let internalUpdateDraft = { versionId: null, updateContentId: null, updateLines: [] };
+const internalRowMask = document.getElementById("internalRowMask");
 const betaModal = document.getElementById("betaModal");
 const betaDialog = betaModal.querySelector(".beta-modal");
 const betaModalTitle = document.getElementById("betaModalTitle");
@@ -666,11 +759,13 @@ function saveBetaWhitelist() {
 function showPage(page) {
   currentPage = page;
   hideBetaList();
+  hideInternalList();
   pageTitle.textContent = pages[page];
   versionPage.hidden = page !== "version";
   updatePage.hidden = page !== "update";
   pluginPage.hidden = page !== "plugin";
   betaBtn.hidden = page !== "version";
+  internalBtn.hidden = page !== "version";
   hotfixBtn.hidden = page !== "version";
   if (!updateModal.hidden) closeUpdateModal();
 }
@@ -864,6 +959,7 @@ function openConfirmModal(id, target = "version") {
   const messages = {
     plugin: "确定要删除这条插件记录吗？删除后不可恢复。",
     beta: "确定要删除这条公测记录吗？删除后不可恢复。",
+    internal: "确定要删除这条内部渠道记录吗？删除后不可恢复。",
     version: "确定要删除这条版本记录吗？删除后不可恢复。",
     update: "确定要删除这条更新内容吗？删除后不可恢复。",
   };
@@ -897,7 +993,595 @@ addBtn.addEventListener("click", () => {
   if (currentPage === "update") openUpdateModal();
 });
 
+function internalChannelLines(value) {
+  const channels = [];
+  String(value || "").split(/\r?\n/).forEach((line) => {
+    const channel = line.trim();
+    if (channel && !channels.includes(channel)) channels.push(channel);
+  });
+  return channels;
+}
+
+function releaseChannels(item) {
+  return item.channelMode === "custom" ? internalChannelLines(item.channels) : internalChannels.slice();
+}
+
+function emptyChannelState() {
+  return { publishStatus: "published", updateResult: "failed" };
+}
+
+function channelState(item, channel) {
+  const saved = item.channelStates && item.channelStates[channel];
+  const updateResult = saved && saved.updateResult === "success" ? "success" : "failed";
+  const publishStatus = saved && saved.publishStatus === "published" ? "published" : "preview";
+  const versionId = saved && saved.versionId ? Number(saved.versionId) : item.versionId;
+  const updatedAt = saved && saved.updatedAt ? saved.updatedAt : item.updatedAt;
+  return { publishStatus, updateResult, versionId, updatedAt };
+}
+
+function versionOptionLabel(record) {
+  return `${record.major} · ${record.name} · ${record.code}`;
+}
+
+function internalStatusLabel(result) {
+  return result === "success" ? "更新成功" : "更新失败";
+}
+
+function internalVersionName(versionId, fallback) {
+  const version = versionRecords.find((record) => record.id === versionId);
+  return version ? version.name : fallback;
+}
+
+function collectInternalRows() {
+  const rows = [];
+  internalReleases.forEach((item) => {
+    releaseChannels(item).forEach((channel) => {
+      const state = channelState(item, channel);
+      rows.push({
+        item,
+        channel,
+        ...state,
+        versionName: internalVersionName(state.versionId, item.version),
+      });
+    });
+  });
+  return rows;
+}
+
+function internalListFilters() {
+  return internalSearchActive ? internalAppliedFilters : { channel: "", status: "", result: "" };
+}
+
+function internalRowMatches(row, filters) {
+  const channel = filters.channel.trim();
+  if (channel && row.channel !== channel) return false;
+  if (filters.status && row.publishStatus !== filters.status) return false;
+  if (filters.result && row.updateResult !== filters.result) return false;
+  return true;
+}
+
+function resetInternalFilters() {
+  internalFilterChannel.value = "";
+  internalFilterStatus.value = "";
+  internalFilterResult.value = "";
+  internalAppliedFilters = { channel: "", status: "", result: "" };
+  internalSearchActive = false;
+}
+
+function applyInternalFilters() {
+  internalSearchActive = true;
+  internalAppliedFilters = {
+    channel: internalFilterChannel.value.trim(),
+    status: internalFilterStatus.value,
+    result: internalFilterResult.value,
+  };
+  renderInternalList();
+}
+
+function internalRowKey(row) {
+  return `${row.item.id}:${row.channel}`;
+}
+
+function syncInternalSelectAll(visible) {
+  const selected = visible.filter((row) => internalSelected.has(internalRowKey(row))).length;
+  internalSelectAll.checked = visible.length > 0 && selected === visible.length;
+  internalSelectAll.indeterminate = selected > 0 && selected < visible.length;
+  internalSelectAll.disabled = visible.length === 0;
+}
+
+function renderInternalList() {
+  const rows = collectInternalRows();
+  const alive = new Set(rows.map(internalRowKey));
+  [...internalSelected].forEach((key) => {
+    if (!alive.has(key)) internalSelected.delete(key);
+  });
+  const visible = rows.filter((row) => internalRowMatches(row, internalListFilters()));
+  const successCount = rows.filter((row) => row.updateResult === "success").length;
+  internalSuccessCount.textContent = String(successCount);
+  internalFailedCount.textContent = String(rows.length - successCount);
+  internalRetryBtn.disabled = visible.every((row) => row.updateResult !== "failed");
+  syncInternalSelectAll(visible);
+  if (visible.length === 0) {
+    internalTableBody.innerHTML = `<tr><td class="empty" colspan="7">${rows.length ? "没有符合条件的渠道" : "暂无内部渠道记录"}</td></tr>`;
+    return;
+  }
+  internalTableBody.innerHTML = visible.map((row) => `<tr>
+    <td class="col-check"><input type="checkbox" class="internal-row-check" data-id="${row.item.id}" data-channel="${escapeHtml(row.channel)}" aria-label="选择${escapeHtml(row.channel)}"${internalSelected.has(internalRowKey(row)) ? " checked" : ""} /></td>
+    <td>${escapeHtml(row.channel)}</td>
+    <td>${escapeHtml(row.versionName)}</td>
+    <td><span class="update-mode ${row.publishStatus === "published" ? "is-published" : "is-preview"}">${row.publishStatus === "published" ? "发布" : "预览"}</span></td>
+    <td><span class="update-mode is-${row.updateResult}">${internalStatusLabel(row.updateResult)}</span></td>
+    <td>${escapeHtml(row.updatedAt)}</td>
+    <td class="action-cell">
+      <button class="btn-link" type="button" data-action="config" data-id="${row.item.id}" data-channel="${escapeHtml(row.channel)}">配置</button>
+      <button class="btn-link btn-link-danger" type="button" data-action="delete" data-id="${row.item.id}">删除</button>
+    </td>
+  </tr>`).join("");
+}
+
+function publishSelectedInternalChannels() {
+  const selected = collectInternalRows().filter((row) => internalSelected.has(internalRowKey(row)));
+  if (selected.length === 0) {
+    showBetaToast("请先勾选渠道");
+    return;
+  }
+  const stamp = betaStamp();
+  selected.forEach((row) => {
+    if (!row.item.channelStates) row.item.channelStates = {};
+    row.item.channelStates[row.channel] = {
+      publishStatus: "published",
+      updateResult: row.updateResult,
+      versionId: row.versionId,
+      updatedAt: stamp,
+    };
+  });
+  renderInternalList();
+  showBetaToast("发布成功");
+}
+
+function retryFailedInternalChannels() {
+  const stamp = betaStamp();
+  const filters = internalListFilters();
+  let retried = 0;
+  collectInternalRows().forEach((row) => {
+    if (!internalRowMatches(row, filters) || row.updateResult !== "failed") return;
+    if (!row.item.channelStates) row.item.channelStates = {};
+    row.item.channelStates[row.channel] = {
+      publishStatus: "preview",
+      updateResult: "success",
+      versionId: row.versionId,
+      updatedAt: stamp,
+    };
+    retried += 1;
+  });
+  if (!retried) return;
+  renderInternalList();
+  showBetaToast("已重试");
+}
+
+function showInternalList() {
+  internalListMask.hidden = false;
+  renderInternalList();
+  internalListClose.focus();
+}
+
+function hideInternalList() {
+  if (!internalModal.hidden) closeInternalModal();
+  if (!internalRowMask.hidden) closeInternalRow();
+  if (!internalCatalogMask.hidden) closeInternalCatalog();
+  if (!internalRecordMask.hidden) closeInternalRecord();
+  resetInternalFilters();
+  internalSelected.clear();
+  internalListMask.hidden = true;
+}
+
+function showInternalHint(message) {
+  internalHint.textContent = message;
+  internalHint.hidden = !message;
+}
+
+function showInternalCatalogHint(message) {
+  internalCatalogHint.textContent = message;
+  internalCatalogHint.hidden = !message;
+}
+
+function renderInternalCatalog(channels) {
+  internalCatalogList.innerHTML = channels.map((channel) => `<div class="channel-row">
+    <input type="text" value="${escapeHtml(channel)}" placeholder="请输入渠道" aria-label="渠道" />
+    <button class="btn-link btn-link-danger" type="button" data-remove>删除</button>
+  </div>`).join("");
+}
+
+function openInternalCatalog() {
+  showInternalCatalogHint("");
+  renderInternalCatalog(internalChannels);
+  internalCatalogMask.hidden = false;
+  const first = internalCatalogList.querySelector("input");
+  if (first) first.focus();
+}
+
+function closeInternalCatalog() {
+  showInternalCatalogHint("");
+  internalCatalogMask.hidden = true;
+}
+
+function addInternalCatalogRow() {
+  showInternalCatalogHint("");
+  internalCatalogList.insertAdjacentHTML("beforeend", `<div class="channel-row">
+    <input type="text" value="" placeholder="请输入渠道" aria-label="渠道" />
+    <button class="btn-link btn-link-danger" type="button" data-remove>删除</button>
+  </div>`);
+  const inputs = internalCatalogList.querySelectorAll("input");
+  inputs[inputs.length - 1].focus();
+}
+
+function saveInternalCatalog() {
+  const channels = [];
+  internalCatalogList.querySelectorAll("input").forEach((input) => {
+    const channel = input.value.trim();
+    if (channel && !channels.includes(channel)) channels.push(channel);
+  });
+  if (channels.length === 0) {
+    showInternalCatalogHint("请至少填写一个渠道");
+    const first = internalCatalogList.querySelector("input");
+    if (first) first.focus();
+    return;
+  }
+  internalChannels.splice(0, internalChannels.length, ...channels);
+  closeInternalCatalog();
+  showBetaToast("已保存内部渠道配置");
+}
+
+function fillInternalVersions() {
+  const select = internalForm.elements.versionId;
+  const current = select.value;
+  select.innerHTML = `<option value="" selected disabled>请选择游戏盒版本</option>${versionRecords
+    .map((record) => `<option value="${record.id}">${escapeHtml(versionOptionLabel(record))}</option>`)
+    .join("")}`;
+  if (versionRecords.some((record) => String(record.id) === current)) select.value = current;
+}
+
+function syncInternalChannelField() {
+  internalChannelField.hidden = internalForm.elements.channelMode.value !== "custom";
+}
+
+function showInternalContentHint(message) {
+  internalContentHint.textContent = message;
+  internalContentHint.hidden = !message;
+}
+
+function updateContentLines(item) {
+  return (item && item.items ? item.items : []).map((row) => String(row.text || "").trim()).filter(Boolean);
+}
+
+function updateContentOptionLabel(item) {
+  const shared = updateContents.some((row) => row.id !== item.id && row.major === item.major);
+  return shared ? `${item.major} · ${item.updatedAt}` : item.major;
+}
+
+function writeInternalContentEditor(lines) {
+  const filled = lines.map((line) => String(line || "").trim()).filter(Boolean);
+  internalContentEditor.classList.toggle("is-placeholder", filled.length === 0);
+  internalContentEditor.innerHTML = filled.map((line) => `<div>${escapeHtml(line)}</div>`).join("");
+}
+
+function readInternalContentEditor() {
+  return internalContentEditor.innerText.replace(/\u00a0/g, " ").split(/\n/).map((line) => line.trim()).filter(Boolean);
+}
+
+function fillInternalContentSelect(selectedId) {
+  internalContentSelect.innerHTML = `<option value="">请选择</option>${updateContents
+    .map((item) => `<option value="${item.id}">${escapeHtml(updateContentOptionLabel(item))}</option>`)
+    .join("")}`;
+  internalContentSelect.value = updateContents.some((item) => String(item.id) === String(selectedId)) ? String(selectedId) : "";
+}
+
+function internalContentEditorLines(version, content) {
+  const lines = [];
+  if (version && version.name) lines.push(version.name);
+  updateContentLines(content).forEach((line) => lines.push(line));
+  return lines;
+}
+
+function selectedInternalContent() {
+  return updateContents.find((item) => String(item.id) === internalContentSelect.value) || null;
+}
+
+function selectedInternalRecordVersion() {
+  return versionRecords.find((item) => String(item.id) === internalRecordVersion.value) || null;
+}
+
+function fillInternalRecordVersions(selectedId) {
+  internalRecordVersion.innerHTML = `<option value="" selected disabled>请选择游戏盒版本</option>${versionRecords
+    .map((record) => `<option value="${record.id}">${escapeHtml(versionOptionLabel(record))}</option>`)
+    .join("")}`;
+  internalRecordVersion.value = versionRecords.some((record) => String(record.id) === String(selectedId)) ? String(selectedId) : "";
+}
+
+function applyInternalRecordVersion(version, restoreDraft) {
+  if (!version) {
+    fillInternalContentSelect("");
+    writeInternalContentEditor([]);
+    showInternalContentHint("");
+    return;
+  }
+  const matched = matchUpdateContentId(version.major);
+  const draftMatches = restoreDraft
+    && internalUpdateDraft.versionId === version.id
+    && internalUpdateDraft.updateLines.length
+    && updateContents.some((item) => item.id === internalUpdateDraft.updateContentId);
+  fillInternalContentSelect(draftMatches ? internalUpdateDraft.updateContentId : matched);
+  const content = selectedInternalContent();
+  if (draftMatches && content && content.id === internalUpdateDraft.updateContentId) writeInternalContentEditor(internalUpdateDraft.updateLines);
+  else writeInternalContentEditor(internalContentEditorLines(version, content));
+  showInternalContentHint(content ? "" : "该主版本暂无更新内容");
+}
+
+function openInternalRecord() {
+  showInternalContentHint("");
+  const savedVersion = versionRecords.some((item) => item.id === internalUpdateDraft.versionId)
+    ? internalUpdateDraft.versionId
+    : "";
+  fillInternalRecordVersions(savedVersion);
+  applyInternalRecordVersion(selectedInternalRecordVersion(), true);
+  internalRecordMask.hidden = false;
+  internalRecordVersion.focus();
+}
+
+function closeInternalRecord() {
+  showInternalContentHint("");
+  internalRecordMask.hidden = true;
+}
+
+function saveInternalRecord() {
+  const version = selectedInternalRecordVersion();
+  if (!version) {
+    showInternalContentHint("请选择游戏盒版本");
+    internalRecordVersion.focus();
+    return;
+  }
+  const content = selectedInternalContent();
+  const updateLines = readInternalContentEditor();
+  if (!content) {
+    showInternalContentHint("请选择更新内容");
+    internalContentSelect.focus();
+    return;
+  }
+  if (updateLines.length === 0) {
+    showInternalContentHint("请填写更新内容");
+    internalContentEditor.focus();
+    return;
+  }
+  internalUpdateDraft = { versionId: version.id, updateContentId: content.id, updateLines };
+  closeInternalRecord();
+  showBetaToast("已保存更新记录");
+}
+
+function readInternalChannels() {
+  return internalChannelLines(internalForm.elements.channels.value);
+}
+
+function openInternalModal(item) {
+  editingInternalId = item ? item.id : null;
+  internalForm.reset();
+  showInternalHint("");
+  internalModalTitle.textContent = "选择版本与渠道";
+  fillInternalVersions();
+  if (item) {
+    internalForm.elements.versionId.value = String(item.versionId);
+    internalForm.elements.channelMode.value = item.channelMode === "custom" ? "custom" : "all";
+    internalForm.elements.channels.value = internalChannelLines(item.channels).join("\n");
+  }
+  syncInternalChannelField();
+  internalModal.hidden = false;
+  internalForm.elements.versionId.focus();
+}
+
+function closeInternalModal() {
+  editingInternalId = null;
+  showInternalHint("");
+  internalModal.hidden = true;
+}
+
+function showInternalRowHint(message) {
+  internalRowHint.textContent = message;
+  internalRowHint.hidden = !message;
+}
+
+function fillInternalPackages(selectedId) {
+  const select = internalRowForm.elements.versionId;
+  select.innerHTML = `<option value="" disabled>请选择游戏盒版本</option>${versionRecords
+    .map((record) => `<option value="${record.id}">${escapeHtml(versionOptionLabel(record))}</option>`)
+    .join("")}`;
+  select.value = versionRecords.some((record) => record.id === Number(selectedId)) ? String(selectedId) : "";
+}
+
+function openInternalRow(item, channel) {
+  const state = channelState(item, channel);
+  editingInternalRow = { id: item.id, channel };
+  internalRowForm.reset();
+  showInternalRowHint("");
+  internalRowTitle.textContent = `配置 ${channel}`;
+  fillInternalPackages(state.versionId);
+  internalRowForm.elements.publishStatus.value = state.publishStatus === "published" ? "published" : "preview";
+  internalRowMask.hidden = false;
+  internalRowForm.elements.versionId.focus();
+}
+
+function closeInternalRow() {
+  editingInternalRow = null;
+  showInternalRowHint("");
+  internalRowMask.hidden = true;
+}
+
+function saveInternalRow() {
+  const item = editingInternalRow && internalReleases.find((row) => row.id === editingInternalRow.id);
+  const version = versionRecords.find((record) => String(record.id) === internalRowForm.elements.versionId.value);
+  if (!item || !editingInternalRow.channel) return;
+  if (!version) {
+    showInternalRowHint("请选择游戏盒版本");
+    internalRowForm.elements.versionId.focus();
+    return;
+  }
+  const current = channelState(item, editingInternalRow.channel);
+  const packageChanged = version.id !== current.versionId;
+  if (!item.channelStates) item.channelStates = {};
+  item.channelStates[editingInternalRow.channel] = {
+    publishStatus: packageChanged
+      ? current.updateResult === "success" ? "preview" : "published"
+      : internalRowForm.elements.publishStatus.value === "published" ? "published" : "preview",
+    updateResult: current.updateResult,
+    versionId: version.id,
+    updatedAt: packageChanged ? betaStamp() : current.updatedAt,
+  };
+  closeInternalRow();
+  renderInternalList();
+  showBetaToast("已保存配置");
+}
+
+function saveInternalRelease() {
+  const version = versionRecords.find((item) => String(item.id) === internalForm.elements.versionId.value);
+  if (!version) {
+    showInternalHint("请选择游戏盒版本");
+    internalForm.elements.versionId.focus();
+    return;
+  }
+  const custom = internalForm.elements.channelMode.value === "custom";
+  const updateContentId = !custom && internalUpdateDraft.updateContentId ? internalUpdateDraft.updateContentId : null;
+  const updateLines = updateContentId ? internalUpdateDraft.updateLines.slice() : [];
+  let channels = "";
+  if (custom) {
+    const parsed = readInternalChannels();
+    if (parsed.length === 0) {
+      showInternalHint("请填写渠道");
+      internalForm.elements.channels.focus();
+      return;
+    }
+    channels = parsed.join("\n");
+  }
+  const editing = editingInternalId;
+  const previous = editing ? internalReleases.find((item) => item.id === editing) : null;
+  const selected = custom ? internalChannelLines(channels) : internalChannels.slice();
+  const channelStates = {};
+  selected.forEach((channel) => {
+    const saved = previous && previous.channelStates && previous.channelStates[channel];
+    channelStates[channel] = saved ? channelState(previous, channel) : emptyChannelState();
+  });
+  const record = {
+    versionId: version.id,
+    appName: `4399游戏盒${version.major}`,
+    version: version.name,
+    channelMode: custom ? "custom" : "all",
+    channels,
+    updateContentId,
+    updateLines,
+    channelStates,
+    updatedAt: betaStamp(),
+  };
+  if (editing) {
+    const index = internalReleases.findIndex((item) => item.id === editing);
+    if (index >= 0) internalReleases[index] = { ...internalReleases[index], ...record };
+  } else {
+    internalReleases.unshift({ id: nextInternalId, ...record });
+    nextInternalId += 1;
+  }
+  closeInternalModal();
+  renderInternalList();
+  showBetaToast("已保存选择版本与渠道");
+}
+
 betaBtn.addEventListener("click", showBetaList);
+internalBtn.addEventListener("click", showInternalList);
+internalListClose.addEventListener("click", hideInternalList);
+internalAddBtn.addEventListener("click", () => openInternalModal());
+internalRecordBtn.addEventListener("click", openInternalRecord);
+internalRecordCancel.addEventListener("click", closeInternalRecord);
+internalRecordSave.addEventListener("click", saveInternalRecord);
+internalRecordMask.addEventListener("click", (event) => {
+  if (event.target === internalRecordMask) closeInternalRecord();
+});
+internalCatalogBtn.addEventListener("click", openInternalCatalog);
+internalBatchBtn.addEventListener("click", publishSelectedInternalChannels);
+internalSelectAll.addEventListener("change", () => {
+  collectInternalRows().filter((row) => internalRowMatches(row, internalListFilters())).forEach((row) => {
+    const key = internalRowKey(row);
+    if (internalSelectAll.checked) internalSelected.add(key);
+    else internalSelected.delete(key);
+  });
+  renderInternalList();
+});
+internalTableBody.addEventListener("change", (event) => {
+  const box = event.target.closest(".internal-row-check");
+  if (!box) return;
+  const key = `${box.dataset.id}:${box.dataset.channel}`;
+  if (box.checked) internalSelected.add(key);
+  else internalSelected.delete(key);
+  const visible = collectInternalRows().filter((row) => internalRowMatches(row, internalListFilters()));
+  syncInternalSelectAll(visible);
+});
+internalRetryBtn.addEventListener("click", retryFailedInternalChannels);
+internalFilterSearch.addEventListener("click", applyInternalFilters);
+internalCatalogAdd.addEventListener("click", addInternalCatalogRow);
+internalCatalogCancel.addEventListener("click", closeInternalCatalog);
+internalCatalogSave.addEventListener("click", saveInternalCatalog);
+internalCatalogList.addEventListener("click", (event) => {
+  const button = event.target.closest("[data-remove]");
+  if (!button) return;
+  button.closest(".channel-row").remove();
+});
+internalCatalogList.addEventListener("input", () => showInternalCatalogHint(""));
+internalCatalogMask.addEventListener("click", (event) => {
+  if (event.target === internalCatalogMask) closeInternalCatalog();
+});
+internalTableBody.addEventListener("click", (event) => {
+  const button = event.target.closest("button");
+  if (!button) return;
+  const id = Number(button.dataset.id);
+  const item = internalReleases.find((row) => row.id === id);
+  if (!item) return;
+  if (button.dataset.action === "config") openInternalRow(item, button.dataset.channel);
+  if (button.dataset.action === "delete") openConfirmModal(id, "internal");
+});
+internalListMask.addEventListener("click", (event) => {
+  if (event.target === internalListMask) hideInternalList();
+});
+internalForm.addEventListener("change", (event) => {
+  if (event.target.name === "channelMode") {
+    syncInternalChannelField();
+    showInternalHint("");
+  }
+  if (event.target.name === "versionId") showInternalHint("");
+});
+internalRecordVersion.addEventListener("change", () => {
+  applyInternalRecordVersion(selectedInternalRecordVersion(), false);
+});
+internalContentSelect.addEventListener("change", () => {
+  showInternalContentHint("");
+  const content = selectedInternalContent();
+  writeInternalContentEditor(internalContentEditorLines(selectedInternalRecordVersion(), content));
+});
+internalContentEditor.addEventListener("input", () => {
+  internalContentEditor.classList.toggle("is-placeholder", readInternalContentEditor().length === 0);
+  showInternalContentHint("");
+});
+internalForm.addEventListener("input", () => showInternalHint(""));
+internalForm.addEventListener("submit", (event) => {
+  event.preventDefault();
+  saveInternalRelease();
+});
+internalCancelBtn.addEventListener("click", closeInternalModal);
+internalModal.addEventListener("click", (event) => {
+  if (event.target === internalModal) closeInternalModal();
+});
+internalRowCancel.addEventListener("click", closeInternalRow);
+internalRowMask.addEventListener("click", (event) => {
+  if (event.target === internalRowMask) closeInternalRow();
+});
+internalRowForm.addEventListener("input", () => showInternalRowHint(""));
+internalRowForm.addEventListener("submit", (event) => {
+  event.preventDefault();
+  saveInternalRow();
+});
 betaListClose.addEventListener("click", hideBetaList);
 betaWhitelistBtn.addEventListener("click", openBetaWhitelist);
 betaWhitelistCancel.addEventListener("click", closeBetaWhitelist);
@@ -1602,6 +2286,14 @@ confirmOkBtn.addEventListener("click", () => {
     if (index >= 0) betaReleases.splice(index, 1);
     closeConfirmModal();
     renderBetaList();
+    return;
+  }
+
+  if (pendingDeleteTarget === "internal") {
+    const index = internalReleases.findIndex((item) => item.id === pendingDeleteId);
+    if (index >= 0) internalReleases.splice(index, 1);
+    closeConfirmModal();
+    renderInternalList();
     return;
   }
 
