@@ -473,7 +473,12 @@ const internalListMask = document.getElementById("internalListMask");
 const internalListClose = document.getElementById("internalListClose");
 const internalAddBtn = document.getElementById("internalAddBtn");
 const internalRecordBtn = document.getElementById("internalRecordBtn");
+const internalRecordListMask = document.getElementById("internalRecordListMask");
+const internalRecordListClose = document.getElementById("internalRecordListClose");
+const internalRecordAddBtn = document.getElementById("internalRecordAddBtn");
+const internalRecordTableBody = document.getElementById("internalRecordTableBody");
 const internalRecordMask = document.getElementById("internalRecordMask");
+const internalRecordHeading = document.getElementById("internalRecordTitle");
 const internalRecordCancel = document.getElementById("internalRecordCancel");
 const internalRecordSave = document.getElementById("internalRecordSave");
 const internalRecordVersion = document.getElementById("internalRecordVersion");
@@ -511,7 +516,10 @@ const internalChannelField = document.getElementById("internalChannelField");
 const internalContentSelect = document.getElementById("internalContentSelect");
 const internalContentEditor = document.getElementById("internalContentEditor");
 const internalContentHint = document.getElementById("internalContentHint");
-let internalUpdateDraft = { versionId: null, updateContentId: null, updateLines: [], title: "", updatedOn: "", versionName: "", downloadLink: "" };
+let internalUpdateRecords = [];
+let nextInternalRecordId = 1;
+let editingInternalRecordId = null;
+let internalUpdateDraft = { id: null, versionId: null, updateContentId: null, updateLines: [], title: "", updatedOn: "", versionName: "", downloadLink: "", publishStatus: "preview" };
 let internalEditorVersionLine = "";
 const internalRowMask = document.getElementById("internalRowMask");
 const betaModal = document.getElementById("betaModal");
@@ -966,6 +974,7 @@ function openConfirmModal(id, target = "version") {
     plugin: "确定要删除这条插件记录吗？删除后不可恢复。",
     beta: "确定要删除这条公测记录吗？删除后不可恢复。",
     internal: "确定要删除这条内部渠道记录吗？删除后不可恢复。",
+    record: "确定要删除这条更新记录吗？删除后不可恢复。",
     version: "确定要删除这条版本记录吗？删除后不可恢复。",
     update: "确定要删除这条更新内容吗？删除后不可恢复。",
   };
@@ -1175,7 +1184,7 @@ function hideInternalList() {
   if (!internalModal.hidden) closeInternalModal();
   if (!internalRowMask.hidden) closeInternalRow();
   if (!internalCatalogMask.hidden) closeInternalCatalog();
-  if (!internalRecordMask.hidden) closeInternalRecord();
+  if (!internalRecordListMask.hidden) hideInternalRecordList();
   resetInternalFilters();
   internalSelected.clear();
   internalListMask.hidden = true;
@@ -1358,18 +1367,88 @@ function applyInternalRecordVersion(version, restoreDraft) {
   showInternalContentHint(content ? "" : "该主版本暂无更新内容");
 }
 
-function openInternalRecord() {
+function internalRecordStatusValue() {
+  const selected = document.querySelector('input[name="internalRecordStatus"]:checked');
+  return selected && selected.value === "published" ? "published" : "preview";
+}
+
+function setInternalRecordStatus(value) {
+  const status = value === "published" ? "published" : "preview";
+  document.querySelectorAll('input[name="internalRecordStatus"]').forEach((input) => {
+    input.checked = input.value === status;
+  });
+}
+
+function resetInternalRecordForm() {
+  editingInternalRecordId = null;
+  internalRecordHeading.textContent = "新增更新记录";
   showInternalContentHint("");
-  const savedVersion = versionRecords.some((item) => item.id === internalUpdateDraft.versionId)
-    ? internalUpdateDraft.versionId
-    : "";
-  fillInternalRecordVersions(savedVersion);
-  applyInternalRecordVersion(selectedInternalRecordVersion(), true);
+  internalRecordTitle.value = INTERNAL_RECORD_TITLE;
+  internalRecordDate.value = todayInputDate();
+  internalRecordName.value = "";
+  internalRecordLink.value = "";
+  setInternalRecordStatus("preview");
+  fillInternalRecordVersions("");
+  fillInternalContentSelect("");
+  writeInternalContentEditor([]);
+}
+
+function renderInternalRecordList() {
+  if (internalUpdateRecords.length === 0) {
+    internalRecordTableBody.innerHTML = '<tr><td class="empty" colspan="6">暂无更新记录</td></tr>';
+    return;
+  }
+  internalRecordTableBody.innerHTML = internalUpdateRecords.map((item) => {
+    const published = item.publishStatus === "published";
+    return `<tr>
+    <td>${escapeHtml(item.title)}</td>
+    <td>${escapeHtml(item.versionName)}</td>
+    <td>${escapeHtml(item.updatedOn)}</td>
+    <td class="link-cell">${item.downloadLink ? `<a href="${escapeHtml(item.downloadLink)}" target="_blank" rel="noopener noreferrer">${escapeHtml(item.downloadLink)}</a>` : ""}</td>
+    <td><span class="update-mode ${published ? "is-published" : "is-preview"}">${published ? "发布" : "预览"}</span></td>
+    <td class="action-cell">
+      <button class="btn-link" type="button" data-action="config" data-id="${item.id}">配置</button>
+      <button class="btn-link btn-link-danger" type="button" data-action="delete" data-id="${item.id}">删除</button>
+    </td>
+  </tr>`;
+  }).join("");
+}
+
+function showInternalRecordList() {
+  renderInternalRecordList();
+  internalRecordListMask.hidden = false;
+  internalRecordListClose.focus();
+}
+
+function hideInternalRecordList() {
+  if (!internalRecordMask.hidden) closeInternalRecord();
+  internalRecordListMask.hidden = true;
+}
+
+function openInternalRecord(record) {
+  resetInternalRecordForm();
+  if (record) {
+    editingInternalRecordId = record.id;
+    internalRecordHeading.textContent = "配置";
+    internalRecordTitle.value = record.title || INTERNAL_RECORD_TITLE;
+    internalRecordDate.value = record.updatedOn || todayInputDate();
+    setInternalRecordStatus(record.publishStatus);
+    fillInternalRecordVersions(record.versionId);
+    const version = selectedInternalRecordVersion();
+    internalRecordName.value = record.versionName || (version ? version.name : "");
+    internalRecordLink.value = record.downloadLink || a4399DownloadLink(version);
+    fillInternalContentSelect(record.updateContentId || "");
+    const lines = record.updateLines && record.updateLines.length ? record.updateLines : updateContentLines(selectedInternalContent());
+    writeInternalContentEditor(ensureVersionNameLine(lines));
+    showInternalContentHint(selectedInternalContent() ? "" : "该主版本暂无更新内容");
+  }
   internalRecordMask.hidden = false;
   internalRecordVersion.focus();
 }
 
 function closeInternalRecord() {
+  editingInternalRecordId = null;
+  internalRecordHeading.textContent = "新增更新记录";
   showInternalContentHint("");
   internalRecordMask.hidden = true;
 }
@@ -1393,7 +1472,7 @@ function saveInternalRecord() {
     internalContentEditor.focus();
     return;
   }
-  internalUpdateDraft = {
+  const fields = {
     versionId: version.id,
     updateContentId: content.id,
     updateLines,
@@ -1401,8 +1480,23 @@ function saveInternalRecord() {
     updatedOn: internalRecordDate.value || todayInputDate(),
     versionName: internalRecordName.value.trim(),
     downloadLink: internalRecordLink.value.trim(),
+    publishStatus: internalRecordStatusValue(),
   };
+  let record;
+  if (editingInternalRecordId) {
+    const index = internalUpdateRecords.findIndex((item) => item.id === editingInternalRecordId);
+    if (index < 0) return;
+    record = { ...internalUpdateRecords[index], ...fields };
+    internalUpdateRecords[index] = record;
+    if (internalUpdateDraft.id === record.id) internalUpdateDraft = { ...record, updateLines: updateLines.slice() };
+  } else {
+    record = { id: nextInternalRecordId, ...fields };
+    nextInternalRecordId += 1;
+    internalUpdateRecords.unshift(record);
+    internalUpdateDraft = { ...record, updateLines: updateLines.slice() };
+  }
   closeInternalRecord();
+  renderInternalRecordList();
   showBetaToast("已保存更新记录");
 }
 
@@ -1543,7 +1637,20 @@ betaBtn.addEventListener("click", showBetaList);
 internalBtn.addEventListener("click", showInternalList);
 internalListClose.addEventListener("click", hideInternalList);
 internalAddBtn.addEventListener("click", () => openInternalModal());
-internalRecordBtn.addEventListener("click", openInternalRecord);
+internalRecordBtn.addEventListener("click", showInternalRecordList);
+internalRecordListClose.addEventListener("click", hideInternalRecordList);
+internalRecordAddBtn.addEventListener("click", () => openInternalRecord());
+internalRecordListMask.addEventListener("click", (event) => {
+  if (event.target === internalRecordListMask) hideInternalRecordList();
+});
+internalRecordTableBody.addEventListener("click", (event) => {
+  const button = event.target.closest("button");
+  if (!button) return;
+  const item = internalUpdateRecords.find((row) => row.id === Number(button.dataset.id));
+  if (!item) return;
+  if (button.dataset.action === "config") openInternalRecord(item);
+  if (button.dataset.action === "delete") openConfirmModal(item.id, "record");
+});
 internalRecordCancel.addEventListener("click", closeInternalRecord);
 internalRecordSave.addEventListener("click", saveInternalRecord);
 internalRecordMask.addEventListener("click", (event) => {
@@ -2360,6 +2467,20 @@ confirmOkBtn.addEventListener("click", () => {
     if (index >= 0) updateContents.splice(index, 1);
     closeConfirmModal();
     renderUpdateList();
+    return;
+  }
+
+  if (pendingDeleteTarget === "record") {
+    const index = internalUpdateRecords.findIndex((item) => item.id === pendingDeleteId);
+    if (index >= 0) internalUpdateRecords.splice(index, 1);
+    if (internalUpdateDraft.id === pendingDeleteId) {
+      const latest = internalUpdateRecords[0];
+      internalUpdateDraft = latest
+        ? { ...latest, updateLines: latest.updateLines.slice() }
+        : { id: null, versionId: null, updateContentId: null, updateLines: [], title: "", updatedOn: "", versionName: "", downloadLink: "", publishStatus: "preview" };
+    }
+    closeConfirmModal();
+    renderInternalRecordList();
     return;
   }
 

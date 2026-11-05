@@ -282,6 +282,12 @@ select {
 .col-internal-result { width: 14%; }
 .col-internal-updated { width: 17%; }
 .col-internal-action { width: 22%; }
+.col-record-title { width: 16%; }
+.col-record-name { width: 14%; }
+.col-record-date { width: 14%; }
+.col-record-link { width: 26%; }
+.col-record-status { width: 12%; }
+.col-record-action { width: 18%; }
 
 #internalListMask .col-check {
   width: 44px;
@@ -1174,7 +1180,8 @@ select {
 #internalModal,
 #internalRowMask,
 #internalCatalogMask,
-#internalRecordMask { z-index: 35; }
+#internalRecordListMask { z-index: 35; }
+#internalRecordMask { z-index: 45; }
 
 .channel-catalog-note {
   margin: -8px 0 16px;

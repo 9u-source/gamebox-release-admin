@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>管理后台</title>
-  <link rel="stylesheet" href="styles.css?v=36" />
+  <link rel="stylesheet" href="styles.css?v=38" />
 </head>
 <body>
   <div class="layout">
@@ -714,9 +714,46 @@
     </div>
   </div>
 
+  <div class="modal-mask" id="internalRecordListMask" hidden>
+    <div class="modal hotfix-shell" role="dialog" aria-modal="true" aria-labelledby="internalRecordListTitle">
+      <header class="hotfix-head">
+        <h2 class="modal-title" id="internalRecordListTitle">更新记录</h2>
+        <div class="topbar-actions">
+          <button class="btn-record" type="button" id="internalRecordAddBtn">新增更新记录</button>
+          <button class="btn-ghost" type="button" id="internalRecordListClose">关闭</button>
+        </div>
+      </header>
+      <div class="hotfix-body">
+        <div class="panel">
+          <table class="data-table">
+            <colgroup>
+              <col class="col-record-title" />
+              <col class="col-record-name" />
+              <col class="col-record-date" />
+              <col class="col-record-link" />
+              <col class="col-record-status" />
+              <col class="col-record-action" />
+            </colgroup>
+            <thead>
+              <tr>
+                <th>标题</th>
+                <th>版本名称</th>
+                <th>更新时间</th>
+                <th>下载地址</th>
+                <th>状态</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody id="internalRecordTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div class="modal-mask" id="internalRecordMask" hidden>
     <div class="modal internal-modal" role="dialog" aria-labelledby="internalRecordTitle" aria-modal="true">
-      <h2 class="modal-title" id="internalRecordTitle">更新记录</h2>
+      <h2 class="modal-title" id="internalRecordTitle">新增更新记录</h2>
       <div id="internalContentBlock">
         <label class="field">
           <span>游戏盒版本</span>
@@ -740,6 +777,19 @@
           <span>下载地址</span>
           <input id="internalRecordLink" type="text" placeholder="请输入下载地址" />
         </label>
+        <div class="field beta-switch">
+          <span>状态</span>
+          <div class="beta-switch-options" role="radiogroup" aria-label="状态">
+            <label>
+              <input type="radio" name="internalRecordStatus" value="preview" checked />
+              <span>预览</span>
+            </label>
+            <label>
+              <input type="radio" name="internalRecordStatus" value="published" />
+              <span>发布</span>
+            </label>
+          </div>
+        </div>
         <label class="field">
           <span>更新内容</span>
           <select id="internalContentSelect">
@@ -774,7 +824,7 @@
   <div class="hotfix-toast" id="hotfixToast" role="status" hidden></div>
   <div class="hotfix-toast" id="betaToast" role="status" hidden></div>
 
-  <script src="app.js?v=46"></script>
+  <script src="app.js?v=48"></script>
   <script src="hotfix.js?v=9"></script>
 </body>
 </html>
