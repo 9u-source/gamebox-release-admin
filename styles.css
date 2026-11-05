@@ -623,6 +623,10 @@ select {
   display: none;
 }
 
+.field input[readonly] {
+  background: #f7f8fa;
+}
+
 .field input,
 .field select {
   width: 100%;

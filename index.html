@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>管理后台</title>
-  <link rel="stylesheet" href="styles.css?v=35" />
+  <link rel="stylesheet" href="styles.css?v=36" />
 </head>
 <body>
   <div class="layout">
@@ -725,6 +725,22 @@
           </select>
         </label>
         <label class="field">
+          <span>标题</span>
+          <input id="internalRecordTitleInput" type="text" value="安卓游戏盒" />
+        </label>
+        <label class="field">
+          <span>更新时间</span>
+          <input id="internalRecordDate" type="date" />
+        </label>
+        <label class="field">
+          <span>版本名称</span>
+          <input id="internalRecordName" type="text" placeholder="请输入版本名称" />
+        </label>
+        <label class="field">
+          <span>下载地址</span>
+          <input id="internalRecordLink" type="text" placeholder="请输入下载地址" />
+        </label>
+        <label class="field">
           <span>更新内容</span>
           <select id="internalContentSelect">
             <option value="">请选择</option>
@@ -758,7 +774,7 @@
   <div class="hotfix-toast" id="hotfixToast" role="status" hidden></div>
   <div class="hotfix-toast" id="betaToast" role="status" hidden></div>
 
-  <script src="app.js?v=42"></script>
+  <script src="app.js?v=46"></script>
   <script src="hotfix.js?v=9"></script>
 </body>
 </html>

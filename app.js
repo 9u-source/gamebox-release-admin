@@ -477,6 +477,11 @@ const internalRecordMask = document.getElementById("internalRecordMask");
 const internalRecordCancel = document.getElementById("internalRecordCancel");
 const internalRecordSave = document.getElementById("internalRecordSave");
 const internalRecordVersion = document.getElementById("internalRecordVersion");
+const internalRecordTitle = document.getElementById("internalRecordTitleInput");
+const internalRecordDate = document.getElementById("internalRecordDate");
+const internalRecordName = document.getElementById("internalRecordName");
+const internalRecordLink = document.getElementById("internalRecordLink");
+const INTERNAL_RECORD_TITLE = "安卓游戏盒";
 const internalCatalogBtn = document.getElementById("internalCatalogBtn");
 const internalBatchBtn = document.getElementById("internalBatchBtn");
 const internalSuccessCount = document.getElementById("internalSuccessCount");
@@ -506,7 +511,8 @@ const internalChannelField = document.getElementById("internalChannelField");
 const internalContentSelect = document.getElementById("internalContentSelect");
 const internalContentEditor = document.getElementById("internalContentEditor");
 const internalContentHint = document.getElementById("internalContentHint");
-let internalUpdateDraft = { versionId: null, updateContentId: null, updateLines: [] };
+let internalUpdateDraft = { versionId: null, updateContentId: null, updateLines: [], title: "", updatedOn: "", versionName: "", downloadLink: "" };
+let internalEditorVersionLine = "";
 const internalRowMask = document.getElementById("internalRowMask");
 const betaModal = document.getElementById("betaModal");
 const betaDialog = betaModal.querySelector(".beta-modal");
@@ -1261,6 +1267,8 @@ function updateContentOptionLabel(item) {
 
 function writeInternalContentEditor(lines) {
   const filled = lines.map((line) => String(line || "").trim()).filter(Boolean);
+  const name = internalRecordName.value.trim();
+  internalEditorVersionLine = name && filled[0] === name ? name : "";
   internalContentEditor.classList.toggle("is-placeholder", filled.length === 0);
   internalContentEditor.innerHTML = filled.map((line) => `<div>${escapeHtml(line)}</div>`).join("");
 }
@@ -1276,11 +1284,43 @@ function fillInternalContentSelect(selectedId) {
   internalContentSelect.value = updateContents.some((item) => String(item.id) === String(selectedId)) ? String(selectedId) : "";
 }
 
-function internalContentEditorLines(version, content) {
-  const lines = [];
-  if (version && version.name) lines.push(version.name);
-  updateContentLines(content).forEach((line) => lines.push(line));
-  return lines;
+function ensureVersionNameLine(lines) {
+  const name = internalRecordName.value.trim();
+  const filled = lines.map((line) => String(line || "").trim()).filter(Boolean);
+  if (!name || filled[0] === name) return filled;
+  return [name, ...filled];
+}
+
+function internalContentEditorLines(content) {
+  return ensureVersionNameLine(updateContentLines(content));
+}
+
+function todayInputDate() {
+  const now = new Date();
+  const month = String(now.getMonth() + 1).padStart(2, "0");
+  const day = String(now.getDate()).padStart(2, "0");
+  return `${now.getFullYear()}-${month}-${day}`;
+}
+
+function a4399DownloadLink(version) {
+  if (!version) return "";
+  const matched = versionRecords.find((item) => item.name === version.name && item.code === version.code && item.channel === "a4399");
+  return (matched || version).link || "";
+}
+
+function applyInternalRecordMeta(version, restoreDraft) {
+  const saved = restoreDraft && version && internalUpdateDraft.versionId === version.id;
+  if (!internalRecordTitle.value.trim()) internalRecordTitle.value = INTERNAL_RECORD_TITLE;
+  if (!internalRecordDate.value) internalRecordDate.value = todayInputDate();
+  if (saved) {
+    internalRecordTitle.value = internalUpdateDraft.title || INTERNAL_RECORD_TITLE;
+    internalRecordDate.value = internalUpdateDraft.updatedOn || todayInputDate();
+    internalRecordLink.value = internalUpdateDraft.downloadLink || a4399DownloadLink(version);
+    internalRecordName.value = internalUpdateDraft.versionName || version.name;
+  } else {
+    internalRecordLink.value = a4399DownloadLink(version);
+    internalRecordName.value = version ? version.name : "";
+  }
 }
 
 function selectedInternalContent() {
@@ -1299,6 +1339,7 @@ function fillInternalRecordVersions(selectedId) {
 }
 
 function applyInternalRecordVersion(version, restoreDraft) {
+  applyInternalRecordMeta(version, restoreDraft);
   if (!version) {
     fillInternalContentSelect("");
     writeInternalContentEditor([]);
@@ -1312,8 +1353,8 @@ function applyInternalRecordVersion(version, restoreDraft) {
     && updateContents.some((item) => item.id === internalUpdateDraft.updateContentId);
   fillInternalContentSelect(draftMatches ? internalUpdateDraft.updateContentId : matched);
   const content = selectedInternalContent();
-  if (draftMatches && content && content.id === internalUpdateDraft.updateContentId) writeInternalContentEditor(internalUpdateDraft.updateLines);
-  else writeInternalContentEditor(internalContentEditorLines(version, content));
+  if (draftMatches && content && content.id === internalUpdateDraft.updateContentId) writeInternalContentEditor(ensureVersionNameLine(internalUpdateDraft.updateLines));
+  else writeInternalContentEditor(internalContentEditorLines(content));
   showInternalContentHint(content ? "" : "该主版本暂无更新内容");
 }
 
@@ -1352,7 +1393,15 @@ function saveInternalRecord() {
     internalContentEditor.focus();
     return;
   }
-  internalUpdateDraft = { versionId: version.id, updateContentId: content.id, updateLines };
+  internalUpdateDraft = {
+    versionId: version.id,
+    updateContentId: content.id,
+    updateLines,
+    title: internalRecordTitle.value.trim() || INTERNAL_RECORD_TITLE,
+    updatedOn: internalRecordDate.value || todayInputDate(),
+    versionName: internalRecordName.value.trim(),
+    downloadLink: internalRecordLink.value.trim(),
+  };
   closeInternalRecord();
   showBetaToast("已保存更新记录");
 }
@@ -1555,10 +1604,19 @@ internalForm.addEventListener("change", (event) => {
 internalRecordVersion.addEventListener("change", () => {
   applyInternalRecordVersion(selectedInternalRecordVersion(), false);
 });
+internalRecordName.addEventListener("input", () => {
+  const name = internalRecordName.value.trim();
+  const lines = readInternalContentEditor();
+  const previous = internalEditorVersionLine;
+  let next = lines;
+  if (previous && lines[0] === previous) next = name ? [name, ...lines.slice(1)] : lines.slice(1);
+  else if (name && lines[0] !== name) next = [name, ...lines];
+  writeInternalContentEditor(next);
+});
 internalContentSelect.addEventListener("change", () => {
   showInternalContentHint("");
   const content = selectedInternalContent();
-  writeInternalContentEditor(internalContentEditorLines(selectedInternalRecordVersion(), content));
+  writeInternalContentEditor(internalContentEditorLines(content));
 });
 internalContentEditor.addEventListener("input", () => {
   internalContentEditor.classList.toggle("is-placeholder", readInternalContentEditor().length === 0);
