@@ -395,10 +395,10 @@ let nextDevId = 5;
 let editingDevId = null;
 
 const stableReleases = [
-  { id: 1, name: "9.8.0.1", code: "2416", link: "https://dlstest.img4399.com/redirect/ftp/client/appftp/9.8/tinker/9.8.0.1/stable_pub/4399Game_9.8.0.1.2416.apk", publishStatus: "published", publishedAt: "2026-11-07 10:12" },
-  { id: 2, name: "9.7.1.4", code: "2408", link: "https://dlstest.img4399.com/redirect/ftp/client/appftp/9.7/tinker/9.7.1.4/stable_pub/4399Game_9.7.1.4.2408.apk", publishStatus: "preview", publishedAt: "2026-10-31 15:40" },
-  { id: 3, name: "9.7.0.38", code: "2402", link: "https://dlstest.img4399.com/redirect/ftp/client/appftp/9.7/tinker/9.7.0.38/stable_pub/4399Game_9.7.0.38.2402.apk", publishStatus: "published", publishedAt: "2026-10-20 09:18" },
-  { id: 4, name: "9.6.2.1", code: "2390", link: "https://dlstest.img4399.com/redirect/ftp/client/appftp/9.6/tinker/9.6.2.1/stable_pub/4399Game_9.6.2.1.2390.apk", publishStatus: "preview", publishedAt: "2026-10-09 11:05" },
+  { id: 1, name: "9.8.0.1", code: "2416", link: "https://dlstest.img4399.com/redirect/ftp/client/appftp/9.8/tinker/9.8.0.1/stable_pub/4399Game_9.8.0.1.2416.apk", size: "188.2 MB", publishStatus: "published", preheatStatus: "heating", publishedAt: "2026-11-07 10:12" },
+  { id: 2, name: "9.7.1.4", code: "2408", link: "https://dlstest.img4399.com/redirect/ftp/client/appftp/9.7/tinker/9.7.1.4/stable_pub/4399Game_9.7.1.4.2408.apk", size: "184.6 MB", publishStatus: "preview", preheatStatus: "success", publishedAt: "2026-10-31 15:40" },
+  { id: 3, name: "9.7.0.38", code: "2402", link: "https://dlstest.img4399.com/redirect/ftp/client/appftp/9.7/tinker/9.7.0.38/stable_pub/4399Game_9.7.0.38.2402.apk", size: "181.3 MB", publishStatus: "published", preheatStatus: "failed", publishedAt: "2026-10-20 09:18" },
+  { id: 4, name: "9.6.2.1", code: "2390", link: "https://dlstest.img4399.com/redirect/ftp/client/appftp/9.6/tinker/9.6.2.1/stable_pub/4399Game_9.6.2.1.2390.apk", size: "176.5 MB", publishStatus: "preview", preheatStatus: "success", publishedAt: "2026-10-09 11:05" },
 ];
 let nextStableId = 5;
 let editingStableId = null;
@@ -509,6 +509,12 @@ const stableForm = document.getElementById("stableForm");
 const stableContentEditor = document.getElementById("stableContentEditor");
 const stableHint = document.getElementById("stableHint");
 const stableCancelBtn = document.getElementById("stableCancelBtn");
+const stablePublishModal = document.getElementById("stablePublishModal");
+const stablePublishText = document.getElementById("stablePublishText");
+const stablePublishCopyBtn = document.getElementById("stablePublishCopyBtn");
+const stablePublishCancelBtn = document.getElementById("stablePublishCancelBtn");
+const stablePublishOkBtn = document.getElementById("stablePublishOkBtn");
+let pendingStableSave = null;
 const internalListMask = document.getElementById("internalListMask");
 const internalListClose = document.getElementById("internalListClose");
 const internalAddBtn = document.getElementById("internalAddBtn");
@@ -1418,22 +1424,43 @@ function hideDevList() {
   devListMask.hidden = true;
 }
 
+function preheatStatusView(status) {
+  if (status === "success") return { label: "预热成功", className: "is-success" };
+  if (status === "failed") return { label: "预热失败", className: "is-failed" };
+  return { label: "预热中", className: "is-pending" };
+}
+
 function renderStableList() {
   if (stableReleases.length === 0) {
-    stableTableBody.innerHTML = '<tr><td class="empty" colspan="6">暂无稳定版记录</td></tr>';
+    stableTableBody.innerHTML = '<tr><td class="empty" colspan="7">暂无稳定版记录</td></tr>';
     return;
   }
-  stableTableBody.innerHTML = stableReleases.map((item) => `<tr>
+  stableTableBody.innerHTML = stableReleases.map((item) => {
+    const preheat = preheatStatusView(item.preheatStatus);
+    return `<tr>
     <td>${escapeHtml(item.name)}</td>
     <td>${escapeHtml(item.code)}</td>
     <td>${item.link ? `<a href="${escapeHtml(item.link)}" target="_blank" rel="noopener noreferrer">${escapeHtml(item.link)}</a>` : ""}</td>
     <td><span class="update-mode ${item.publishStatus === "published" ? "is-published" : "is-preview"}">${item.publishStatus === "published" ? "发布" : "预览"}</span></td>
+    <td>
+      <div class="preheat-cell">
+        <span class="update-mode ${preheat.className}">${preheat.label}</span>
+        <button class="btn-link" type="button" data-action="reheat" data-id="${item.id}">重新预热</button>
+      </div>
+    </td>
     <td>${escapeHtml(item.publishedAt)}</td>
     <td class="action-cell">
       <button class="btn-link" type="button" data-action="config" data-id="${item.id}">配置</button>
       <button class="btn-link btn-link-danger" type="button" data-action="delete" data-id="${item.id}">删除</button>
     </td>
-  </tr>`).join("");
+  </tr>`;
+  }).join("");
+}
+
+function reheatStableRelease(item) {
+  item.preheatStatus = "heating";
+  renderStableList();
+  showBetaToast("已重新预热");
 }
 
 function showStableList() {
@@ -1510,6 +1537,69 @@ function closeStableModal() {
   stableModal.hidden = true;
 }
 
+function stablePackageSize(version, existing) {
+  if (existing && existing.size && existing.name === version.name && existing.code === version.code) return existing.size;
+  const matched = betaReleases.find((item) => (version.id && item.versionId === version.id) || item.version === version.name);
+  return matched && matched.size ? matched.size : "—";
+}
+
+function stablePublishMessage(saved) {
+  return `预计【时间】，推送安卓游戏盒最新版本v${saved.name}的稳定版升级，会有一定规模的用户升级量，担心对带宽带来压力，麻烦运维同学留意一下，地址已预热。\n安装包地址：${saved.link || ""}\n包体大小：${saved.size || "—"}`;
+}
+
+function copyStablePublishText() {
+  const text = stablePublishText.textContent;
+  const done = () => showBetaToast("已复制");
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(done).catch(() => {
+      writeClipboard(text);
+      done();
+    });
+    return;
+  }
+  writeClipboard(text);
+  done();
+}
+
+function writeClipboard(text) {
+  const area = document.createElement("textarea");
+  area.value = text;
+  area.setAttribute("readonly", "");
+  area.style.position = "fixed";
+  area.style.left = "-9999px";
+  document.body.appendChild(area);
+  area.select();
+  document.execCommand("copy");
+  area.remove();
+}
+
+function openStablePublishNotice(saved) {
+  pendingStableSave = saved;
+  stablePublishText.textContent = stablePublishMessage(saved);
+  stablePublishModal.hidden = false;
+  stablePublishOkBtn.focus();
+}
+
+function closeStablePublishNotice() {
+  pendingStableSave = null;
+  stablePublishModal.hidden = true;
+}
+
+function commitStableRelease(saved) {
+  const editing = editingStableId;
+  if (editing) {
+    const index = stableReleases.findIndex((item) => item.id === editing);
+    if (index >= 0) stableReleases[index] = saved;
+  } else {
+    stableReleases.unshift(saved);
+    nextStableId += 1;
+  }
+  closeStablePublishNotice();
+  closeStableModal();
+  renderStableList();
+  showBetaToast(editing ? "已保存配置" : "已新增稳定版");
+}
+
 function saveStableRelease() {
   const existing = editingStableId ? stableReleases.find((item) => item.id === editingStableId) : null;
   const version = selectedReleaseVersion(stableForm.elements.versionId.value, existing);
@@ -1564,21 +1654,18 @@ function saveStableRelease() {
     showRedDot: stableForm.elements.showRedDot.value === "yes" ? "yes" : "no",
     updateContentId: Number(stableForm.elements.updateContentId.value) || null,
     updateLines: readStableContentEditor(),
+    preheatStatus: existing && existing.preheatStatus ? existing.preheatStatus : "heating",
+    size: stablePackageSize(version, existing),
   };
-  const editing = editingStableId;
-  if (editing) {
-    const index = stableReleases.findIndex((item) => item.id === editing);
-    if (index >= 0) stableReleases[index] = saved;
-  } else {
-    stableReleases.unshift(saved);
-    nextStableId += 1;
+  if (saved.publishStatus === "published" && (!existing || existing.publishStatus !== "published")) {
+    openStablePublishNotice(saved);
+    return;
   }
-  closeStableModal();
-  renderStableList();
-  showBetaToast(editing ? "已保存配置" : "已新增稳定版");
+  commitStableRelease(saved);
 }
 
 function hideStableList() {
+  if (!stablePublishModal.hidden) closeStablePublishNotice();
   if (!stableModal.hidden) closeStableModal();
   stableListMask.hidden = true;
 }
@@ -2083,6 +2170,7 @@ stableTableBody.addEventListener("click", (event) => {
   const item = stableReleases.find((row) => row.id === id);
   if (!item) return;
   if (button.dataset.action === "config") openStableModal(item);
+  if (button.dataset.action === "reheat") reheatStableRelease(item);
   if (button.dataset.action === "delete") openConfirmModal(id, "stable");
 });
 stableAddBtn.addEventListener("click", openStableModal);
@@ -2093,6 +2181,15 @@ stableModal.addEventListener("click", (event) => {
 stableForm.addEventListener("submit", (event) => {
   event.preventDefault();
   saveStableRelease();
+});
+stablePublishCopyBtn.addEventListener("click", copyStablePublishText);
+stablePublishCancelBtn.addEventListener("click", closeStablePublishNotice);
+stablePublishModal.addEventListener("click", (event) => {
+  if (event.target === stablePublishModal) closeStablePublishNotice();
+});
+stablePublishOkBtn.addEventListener("click", () => {
+  if (!pendingStableSave) return;
+  commitStableRelease(pendingStableSave);
 });
 stableForm.elements.versionId.addEventListener("change", syncStableUpdateContent);
 stableForm.elements.updateContentId.addEventListener("change", () => {

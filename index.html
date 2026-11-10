@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>管理后台</title>
-  <link rel="stylesheet" href="styles.css?v=43" />
+  <link rel="stylesheet" href="styles.css?v=49" />
 </head>
 <body>
   <div class="layout">
@@ -450,6 +450,18 @@
     </div>
   </div>
 
+  <div class="modal-mask" id="stablePublishModal" hidden>
+    <div class="modal stable-publish-modal" role="dialog" aria-labelledby="stablePublishTitle" aria-modal="true">
+      <h2 class="modal-title" id="stablePublishTitle">发布报备</h2>
+      <p class="stable-publish-text" id="stablePublishText"></p>
+      <div class="modal-actions">
+        <button class="btn-ghost" type="button" id="stablePublishCopyBtn">一键复制</button>
+        <button class="btn-ghost" type="button" id="stablePublishCancelBtn">取消</button>
+        <button class="btn-stable" type="button" id="stablePublishOkBtn">我已报备</button>
+      </div>
+    </div>
+  </div>
+
   <div class="modal-mask" id="confirmModal" hidden>
     <div class="modal confirm-modal" role="dialog" aria-labelledby="confirmTitle" aria-modal="true">
       <h2 class="modal-title" id="confirmTitle">确认删除</h2>
@@ -709,12 +721,13 @@
         <div class="panel">
           <table class="data-table">
             <colgroup>
-              <col class="col-dev-name" />
-              <col class="col-dev-code" />
-              <col class="col-dev-link" />
-              <col class="col-dev-status" />
-              <col class="col-dev-time" />
-              <col class="col-dev-action" />
+              <col class="col-stable-name" />
+              <col class="col-stable-code" />
+              <col class="col-stable-link" />
+              <col class="col-stable-status" />
+              <col class="col-stable-preheat" />
+              <col class="col-stable-time" />
+              <col class="col-stable-action" />
             </colgroup>
             <thead>
               <tr>
@@ -722,6 +735,7 @@
                 <th>版本号</th>
                 <th>下载地址</th>
                 <th>发布状态</th>
+                <th>预热状态</th>
                 <th>发布时间</th>
                 <th>操作</th>
               </tr>
@@ -1058,7 +1072,7 @@
   <div class="hotfix-toast" id="hotfixToast" role="status" hidden></div>
   <div class="hotfix-toast" id="betaToast" role="status" hidden></div>
 
-  <script src="app.js?v=58"></script>
+  <script src="app.js?v=64"></script>
   <script src="hotfix.js?v=9"></script>
 </body>
 </html>

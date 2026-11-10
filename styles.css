@@ -311,6 +311,35 @@ select {
 .col-dev-status { width: 12%; }
 .col-dev-time { width: 16%; }
 .col-dev-action { width: 16%; }
+.col-stable-name { width: 12%; }
+.col-stable-code { width: 8%; }
+.col-stable-link { width: 22%; }
+.col-stable-status { width: 10%; }
+.col-stable-preheat { width: 22%; }
+.col-stable-time { width: 14%; }
+.col-stable-action { width: 12%; }
+
+.preheat-cell {
+  display: grid;
+  grid-template-columns: 72px max-content;
+  align-items: center;
+  column-gap: 12px;
+  white-space: nowrap;
+}
+
+.preheat-cell .update-mode {
+  width: 72px;
+  justify-content: center;
+  box-sizing: border-box;
+}
+
+.preheat-cell .btn-link {
+  margin-right: 0;
+}
+
+#stableListMask td:nth-child(6) {
+  white-space: nowrap;
+}
 .col-internal-check { width: 44px; }
 .col-internal-channel { width: 16%; }
 .col-internal-version { width: 15%; }
@@ -1311,6 +1340,23 @@ select {
 }
 #betaWhitelistMask { z-index: 40; }
 #confirmModal { z-index: 50; }
+#stablePublishModal { z-index: 60; }
+
+.stable-publish-modal {
+  width: min(560px, calc(100vw - 48px));
+}
+
+.stable-publish-text {
+  margin: 0 0 8px;
+  font-size: 14px;
+  line-height: 1.7;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+#stablePublishCopyBtn {
+  margin-right: auto;
+}
 
 .whitelist-modal {
   width: min(560px, calc(100vw - 48px));
@@ -1889,7 +1935,7 @@ textarea.hotfix-input {
 
 .hotfix-toast {
   position: fixed;
-  z-index: 50;
+  z-index: 70;
   top: 24px;
   left: 50%;
   max-width: min(520px, calc(100vw - 32px));
