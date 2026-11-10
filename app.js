@@ -385,6 +385,22 @@ const updateContents = [
   },
 ];
 
+const devReleases = [
+  { id: 1, name: "9.8.0.2", code: "2418", link: "https://dlstest.img4399.com/redirect/ftp/client/appftp/9.8/tinker/9.8.0.2/dev_pub/4399Game_9.8.0.2.2418.apk", publishStatus: "preview", publishedAt: "2026-11-08 14:20" },
+  { id: 2, name: "9.7.1.5", code: "2410", link: "https://dlstest.img4399.com/redirect/ftp/client/appftp/9.7/tinker/9.7.1.5/dev_pub/4399Game_9.7.1.5.2410.apk", publishStatus: "published", publishedAt: "2026-11-02 09:36" },
+  { id: 3, name: "9.7.0.41", code: "2406", link: "https://dlstest.img4399.com/redirect/ftp/client/appftp/9.7/tinker/9.7.0.41/dev_pub/4399Game_9.7.0.41.2406.apk", publishStatus: "preview", publishedAt: "2026-10-26 16:05" },
+  { id: 4, name: "9.6.2.3", code: "2394", link: "https://dlstest.img4399.com/redirect/ftp/client/appftp/9.6/tinker/9.6.2.3/dev_pub/4399Game_9.6.2.3.2394.apk", publishStatus: "published", publishedAt: "2026-10-11 11:18" },
+];
+let nextDevId = 5;
+
+const stableReleases = [
+  { id: 1, name: "9.8.0.1", code: "2416", link: "https://dlstest.img4399.com/redirect/ftp/client/appftp/9.8/tinker/9.8.0.1/stable_pub/4399Game_9.8.0.1.2416.apk", publishStatus: "published", publishedAt: "2026-11-07 10:12" },
+  { id: 2, name: "9.7.1.4", code: "2408", link: "https://dlstest.img4399.com/redirect/ftp/client/appftp/9.7/tinker/9.7.1.4/stable_pub/4399Game_9.7.1.4.2408.apk", publishStatus: "preview", publishedAt: "2026-10-31 15:40" },
+  { id: 3, name: "9.7.0.38", code: "2402", link: "https://dlstest.img4399.com/redirect/ftp/client/appftp/9.7/tinker/9.7.0.38/stable_pub/4399Game_9.7.0.38.2402.apk", publishStatus: "published", publishedAt: "2026-10-20 09:18" },
+  { id: 4, name: "9.6.2.1", code: "2390", link: "https://dlstest.img4399.com/redirect/ftp/client/appftp/9.6/tinker/9.6.2.1/stable_pub/4399Game_9.6.2.1.2390.apk", publishStatus: "preview", publishedAt: "2026-10-09 11:05" },
+];
+let nextStableId = 5;
+
 const betaReleases = [
   { id: 1, versionId: 1, popupTitle: "V9.7游戏盒公测活动", appName: "4399游戏盒V9.7", version: "9.7.0.30", size: "186.4 MB", downloadLink: "https://dlstest.img4399.com/redirect/ftp/client/appftp/9.7/tinker/9.7.0.30/release_pub/4399Game_9.7.0.30.2401.apk", publishStatus: "published", start: "2026-10-20 10:00", end: "2026-11-20 23:59", intro: "抢先体验全新首页和登录改版", entryScope: "all", homePopup: "yes", crowd: "97gongce", lowPercent: 20, midPercent: 20, highPercent: 20, ultraPercent: 20, targetVersions: "", updatedAt: "2026-10-23 18:26" },
   { id: 2, versionId: 2, popupTitle: "V9.6游戏盒公测活动", appName: "4399游戏盒V9.6", version: "9.6.1.12", size: "179.8 MB", downloadLink: "https://dlstest.img4399.com/redirect/ftp/client/appftp/9.6/tinker/9.6.1.12/release_pub/4399Game_9.6.1.12.2388.apk", publishStatus: "published", start: "2026-09-28 10:00", end: "2026-10-28 23:59", intro: "灰度验证登录改版", entryScope: "all", homePopup: "yes", crowd: "96gongce", lowPercent: 15, midPercent: 10, highPercent: 30, ultraPercent: 5, targetVersions: "9.6.1.12", updatedAt: "2026-09-28 16:42" },
@@ -469,6 +485,26 @@ const betaAddBtn = document.getElementById("betaAddBtn");
 const betaTableBody = document.getElementById("betaTableBody");
 const betaBtn = document.getElementById("betaBtn");
 const internalBtn = document.getElementById("internalBtn");
+const devBtn = document.getElementById("devBtn");
+const devListMask = document.getElementById("devListMask");
+const devListClose = document.getElementById("devListClose");
+const devTableBody = document.getElementById("devTableBody");
+const devAddBtn = document.getElementById("devAddBtn");
+const devModal = document.getElementById("devModal");
+const devForm = document.getElementById("devForm");
+const devContentEditor = document.getElementById("devContentEditor");
+const devHint = document.getElementById("devHint");
+const devCancelBtn = document.getElementById("devCancelBtn");
+const stableBtn = document.getElementById("stableBtn");
+const stableListMask = document.getElementById("stableListMask");
+const stableListClose = document.getElementById("stableListClose");
+const stableTableBody = document.getElementById("stableTableBody");
+const stableAddBtn = document.getElementById("stableAddBtn");
+const stableModal = document.getElementById("stableModal");
+const stableForm = document.getElementById("stableForm");
+const stableContentEditor = document.getElementById("stableContentEditor");
+const stableHint = document.getElementById("stableHint");
+const stableCancelBtn = document.getElementById("stableCancelBtn");
 const internalListMask = document.getElementById("internalListMask");
 const internalListClose = document.getElementById("internalListClose");
 const internalAddBtn = document.getElementById("internalAddBtn");
@@ -774,12 +810,16 @@ function showPage(page) {
   currentPage = page;
   hideBetaList();
   hideInternalList();
+  hideDevList();
+  hideStableList();
   pageTitle.textContent = pages[page];
   versionPage.hidden = page !== "version";
   updatePage.hidden = page !== "update";
   pluginPage.hidden = page !== "plugin";
   betaBtn.hidden = page !== "version";
   internalBtn.hidden = page !== "version";
+  devBtn.hidden = page !== "version";
+  stableBtn.hidden = page !== "version";
   hotfixBtn.hidden = page !== "version";
   if (!updateModal.hidden) closeUpdateModal();
 }
@@ -974,6 +1014,8 @@ function openConfirmModal(id, target = "version") {
     plugin: "确定要删除这条插件记录吗？删除后不可恢复。",
     beta: "确定要删除这条公测记录吗？删除后不可恢复。",
     internal: "确定要删除这条内部渠道记录吗？删除后不可恢复。",
+    dev: "确定要删除这条开发版记录吗？删除后不可恢复。",
+    stable: "确定要删除这条稳定版记录吗？删除后不可恢复。",
     record: "确定要删除这条更新记录吗？删除后不可恢复。",
     version: "确定要删除这条版本记录吗？删除后不可恢复。",
     update: "确定要删除这条更新内容吗？删除后不可恢复。",
@@ -1172,6 +1214,305 @@ function retryFailedInternalChannels() {
   if (!retried) return;
   renderInternalList();
   showBetaToast("已重试");
+}
+
+function renderDevList() {
+  if (devReleases.length === 0) {
+    devTableBody.innerHTML = '<tr><td class="empty" colspan="6">暂无开发版记录</td></tr>';
+    return;
+  }
+  devTableBody.innerHTML = devReleases.map((item) => `<tr>
+    <td>${escapeHtml(item.name)}</td>
+    <td>${escapeHtml(item.code)}</td>
+    <td>${item.link ? `<a href="${escapeHtml(item.link)}" target="_blank" rel="noopener noreferrer">${escapeHtml(item.link)}</a>` : ""}</td>
+    <td><span class="update-mode ${item.publishStatus === "published" ? "is-published" : "is-preview"}">${item.publishStatus === "published" ? "发布" : "预览"}</span></td>
+    <td>${escapeHtml(item.publishedAt)}</td>
+    <td class="action-cell">
+      <button class="btn-link" type="button" data-action="config" data-id="${item.id}">配置</button>
+      <button class="btn-link btn-link-danger" type="button" data-action="delete" data-id="${item.id}">删除</button>
+    </td>
+  </tr>`).join("");
+}
+
+function showDevList() {
+  devListMask.hidden = false;
+  renderDevList();
+  devListClose.focus();
+}
+
+function showDevHint(message) {
+  devHint.textContent = message;
+  devHint.hidden = !message;
+}
+
+function fillDevPackages() {
+  const select = devForm.elements.versionId;
+  select.innerHTML = `<option value="" selected disabled>请选择游戏盒版本</option>${versionRecords
+    .map((record) => `<option value="${record.id}">${escapeHtml(versionOptionLabel(record))}</option>`)
+    .join("")}`;
+}
+
+function openDevModal() {
+  devForm.reset();
+  showDevHint("");
+  fillDevPackages();
+  devForm.elements.publishedAt.value = todayInputDate();
+  devForm.elements.publishStatus.value = "preview";
+  devForm.elements.forceMaxVersion.value = "1691";
+  devForm.elements.minSdkVersion.value = "21";
+  devForm.elements.showRedDot.value = "no";
+  syncDevUpdateContent();
+  devModal.hidden = false;
+  devForm.elements.versionId.focus();
+}
+
+function devCommaList(value) {
+  const parts = [];
+  value.split(",").forEach((part) => {
+    const item = part.trim();
+    if (item && !parts.includes(item)) parts.push(item);
+  });
+  return parts.join(",");
+}
+
+function writeDevContentEditor(lines) {
+  const filled = lines.map((line) => String(line || "").trim()).filter(Boolean);
+  devContentEditor.classList.toggle("is-placeholder", filled.length === 0);
+  devContentEditor.innerHTML = filled.map((line) => `<div>${escapeHtml(line)}</div>`).join("");
+}
+
+function readDevContentEditor() {
+  return devContentEditor.innerText.replace(/\u00a0/g, " ").split(/\n/).map((line) => line.trim()).filter(Boolean);
+}
+
+function fillDevContentSelect(selectedId) {
+  const select = devForm.elements.updateContentId;
+  select.innerHTML = `<option value="">请选择</option>${updateContents
+    .map((item) => `<option value="${item.id}">${escapeHtml(updateContentOptionLabel(item))}</option>`)
+    .join("")}`;
+  select.value = updateContents.some((item) => String(item.id) === String(selectedId)) ? String(selectedId) : "";
+}
+
+function syncDevUpdateContent() {
+  const version = versionRecords.find((record) => String(record.id) === devForm.elements.versionId.value);
+  fillDevContentSelect(version ? matchUpdateContentId(version.major) : "");
+  const content = updateContents.find((item) => String(item.id) === devForm.elements.updateContentId.value) || null;
+  writeDevContentEditor(updateContentLines(content));
+}
+
+function closeDevModal() {
+  showDevHint("");
+  devModal.hidden = true;
+}
+
+function saveDevRelease() {
+  const version = versionRecords.find((record) => String(record.id) === devForm.elements.versionId.value);
+  if (!version) {
+    showDevHint("请选择游戏盒版本");
+    devForm.elements.versionId.focus();
+    return;
+  }
+  const publishedAt = devForm.elements.publishedAt.value;
+  if (!publishedAt) {
+    showDevHint("请填写更新时间");
+    devForm.elements.publishedAt.focus();
+    return;
+  }
+  const forceVersionsText = devForm.elements.forceVersions.value;
+  if (forceVersionsText.includes("，")) {
+    showDevHint("强制升级的版本号请使用英文逗号分隔");
+    devForm.elements.forceVersions.focus();
+    return;
+  }
+  const forceMaxVersion = devForm.elements.forceMaxVersion.value.trim();
+  if (!forceMaxVersion) {
+    showDevHint("请填写强制升级的最大版本号");
+    devForm.elements.forceMaxVersion.focus();
+    return;
+  }
+  const minSdkVersion = devForm.elements.minSdkVersion.value.trim();
+  if (!minSdkVersion) {
+    showDevHint("请填写升级允许的最小SdkVersion");
+    devForm.elements.minSdkVersion.focus();
+    return;
+  }
+  const sameVersionText = devForm.elements.sameVersionNames.value;
+  if (sameVersionText.includes("，")) {
+    showDevHint("支持同版本升级请使用英文逗号分隔");
+    devForm.elements.sameVersionNames.focus();
+    return;
+  }
+  devReleases.unshift({
+    id: nextDevId,
+    versionId: version.id,
+    name: version.name,
+    code: version.code,
+    link: version.link,
+    publishStatus: devForm.elements.publishStatus.value === "published" ? "published" : "preview",
+    publishedAt,
+    forceVersions: devCommaList(forceVersionsText),
+    forceMaxVersion,
+    minSdkVersion,
+    sameVersionNames: devCommaList(sameVersionText),
+    summary: devForm.elements.summary.value.trim(),
+    showRedDot: devForm.elements.showRedDot.value === "yes" ? "yes" : "no",
+    updateContentId: Number(devForm.elements.updateContentId.value) || null,
+    updateLines: readDevContentEditor(),
+  });
+  nextDevId += 1;
+  closeDevModal();
+  renderDevList();
+  showBetaToast("已新增开发版");
+}
+
+function hideDevList() {
+  if (!devModal.hidden) closeDevModal();
+  devListMask.hidden = true;
+}
+
+function renderStableList() {
+  if (stableReleases.length === 0) {
+    stableTableBody.innerHTML = '<tr><td class="empty" colspan="6">暂无稳定版记录</td></tr>';
+    return;
+  }
+  stableTableBody.innerHTML = stableReleases.map((item) => `<tr>
+    <td>${escapeHtml(item.name)}</td>
+    <td>${escapeHtml(item.code)}</td>
+    <td>${item.link ? `<a href="${escapeHtml(item.link)}" target="_blank" rel="noopener noreferrer">${escapeHtml(item.link)}</a>` : ""}</td>
+    <td><span class="update-mode ${item.publishStatus === "published" ? "is-published" : "is-preview"}">${item.publishStatus === "published" ? "发布" : "预览"}</span></td>
+    <td>${escapeHtml(item.publishedAt)}</td>
+    <td class="action-cell">
+      <button class="btn-link" type="button" data-action="config" data-id="${item.id}">配置</button>
+      <button class="btn-link btn-link-danger" type="button" data-action="delete" data-id="${item.id}">删除</button>
+    </td>
+  </tr>`).join("");
+}
+
+function showStableList() {
+  stableListMask.hidden = false;
+  renderStableList();
+  stableListClose.focus();
+}
+
+function showStableHint(message) {
+  stableHint.textContent = message;
+  stableHint.hidden = !message;
+}
+
+function fillStablePackages() {
+  const select = stableForm.elements.versionId;
+  select.innerHTML = `<option value="" selected disabled>请选择游戏盒版本</option>${versionRecords
+    .map((record) => `<option value="${record.id}">${escapeHtml(versionOptionLabel(record))}</option>`)
+    .join("")}`;
+}
+
+function openStableModal() {
+  stableForm.reset();
+  showStableHint("");
+  fillStablePackages();
+  stableForm.elements.publishedAt.value = todayInputDate();
+  stableForm.elements.publishStatus.value = "preview";
+  stableForm.elements.forceMaxVersion.value = "1691";
+  stableForm.elements.minSdkVersion.value = "21";
+  stableForm.elements.showRedDot.value = "no";
+  syncStableUpdateContent();
+  stableModal.hidden = false;
+  stableForm.elements.versionId.focus();
+}
+
+function writeStableContentEditor(lines) {
+  const filled = lines.map((line) => String(line || "").trim()).filter(Boolean);
+  stableContentEditor.classList.toggle("is-placeholder", filled.length === 0);
+  stableContentEditor.innerHTML = filled.map((line) => `<div>${escapeHtml(line)}</div>`).join("");
+}
+
+function readStableContentEditor() {
+  return stableContentEditor.innerText.replace(/\u00a0/g, " ").split(/\n/).map((line) => line.trim()).filter(Boolean);
+}
+
+function fillStableContentSelect(selectedId) {
+  const select = stableForm.elements.updateContentId;
+  select.innerHTML = `<option value="">请选择</option>${updateContents
+    .map((item) => `<option value="${item.id}">${escapeHtml(updateContentOptionLabel(item))}</option>`)
+    .join("")}`;
+  select.value = updateContents.some((item) => String(item.id) === String(selectedId)) ? String(selectedId) : "";
+}
+
+function syncStableUpdateContent() {
+  const version = versionRecords.find((record) => String(record.id) === stableForm.elements.versionId.value);
+  fillStableContentSelect(version ? matchUpdateContentId(version.major) : "");
+  const content = updateContents.find((item) => String(item.id) === stableForm.elements.updateContentId.value) || null;
+  writeStableContentEditor(updateContentLines(content));
+}
+
+function closeStableModal() {
+  showStableHint("");
+  stableModal.hidden = true;
+}
+
+function saveStableRelease() {
+  const version = versionRecords.find((record) => String(record.id) === stableForm.elements.versionId.value);
+  if (!version) {
+    showStableHint("请选择游戏盒版本");
+    stableForm.elements.versionId.focus();
+    return;
+  }
+  const publishedAt = stableForm.elements.publishedAt.value;
+  if (!publishedAt) {
+    showStableHint("请填写更新时间");
+    stableForm.elements.publishedAt.focus();
+    return;
+  }
+  const forceVersionsText = stableForm.elements.forceVersions.value;
+  if (forceVersionsText.includes("，")) {
+    showStableHint("强制升级的版本号请使用英文逗号分隔");
+    stableForm.elements.forceVersions.focus();
+    return;
+  }
+  const forceMaxVersion = stableForm.elements.forceMaxVersion.value.trim();
+  if (!forceMaxVersion) {
+    showStableHint("请填写强制升级的最大版本号");
+    stableForm.elements.forceMaxVersion.focus();
+    return;
+  }
+  const minSdkVersion = stableForm.elements.minSdkVersion.value.trim();
+  if (!minSdkVersion) {
+    showStableHint("请填写升级允许的最小SdkVersion");
+    stableForm.elements.minSdkVersion.focus();
+    return;
+  }
+  const sameVersionText = stableForm.elements.sameVersionNames.value;
+  if (sameVersionText.includes("，")) {
+    showStableHint("支持同版本升级请使用英文逗号分隔");
+    stableForm.elements.sameVersionNames.focus();
+    return;
+  }
+  stableReleases.unshift({
+    id: nextStableId,
+    versionId: version.id,
+    name: version.name,
+    code: version.code,
+    link: version.link,
+    publishStatus: stableForm.elements.publishStatus.value === "published" ? "published" : "preview",
+    publishedAt,
+    forceVersions: devCommaList(forceVersionsText),
+    forceMaxVersion,
+    minSdkVersion,
+    sameVersionNames: devCommaList(sameVersionText),
+    summary: stableForm.elements.summary.value.trim(),
+    showRedDot: stableForm.elements.showRedDot.value === "yes" ? "yes" : "no",
+    updateContentId: Number(stableForm.elements.updateContentId.value) || null,
+    updateLines: readStableContentEditor(),
+  });
+  nextStableId += 1;
+  closeStableModal();
+  renderStableList();
+  showBetaToast("已新增稳定版");
+}
+
+function hideStableList() {
+  if (!stableModal.hidden) closeStableModal();
+  stableListMask.hidden = true;
 }
 
 function showInternalList() {
@@ -1634,6 +1975,60 @@ function saveInternalRelease() {
 }
 
 betaBtn.addEventListener("click", showBetaList);
+devBtn.addEventListener("click", showDevList);
+devListClose.addEventListener("click", hideDevList);
+devListMask.addEventListener("click", (event) => {
+  if (event.target === devListMask) hideDevList();
+});
+devTableBody.addEventListener("click", (event) => {
+  const button = event.target.closest("button");
+  if (!button) return;
+  const id = Number(button.dataset.id);
+  const item = devReleases.find((row) => row.id === id);
+  if (!item) return;
+  if (button.dataset.action === "delete") openConfirmModal(id, "dev");
+});
+devAddBtn.addEventListener("click", openDevModal);
+devCancelBtn.addEventListener("click", closeDevModal);
+devModal.addEventListener("click", (event) => {
+  if (event.target === devModal) closeDevModal();
+});
+devForm.addEventListener("submit", (event) => {
+  event.preventDefault();
+  saveDevRelease();
+});
+devForm.elements.versionId.addEventListener("change", syncDevUpdateContent);
+devForm.elements.updateContentId.addEventListener("change", () => {
+  const content = updateContents.find((item) => String(item.id) === devForm.elements.updateContentId.value) || null;
+  writeDevContentEditor(updateContentLines(content));
+});
+stableBtn.addEventListener("click", showStableList);
+stableListClose.addEventListener("click", hideStableList);
+stableListMask.addEventListener("click", (event) => {
+  if (event.target === stableListMask) hideStableList();
+});
+stableTableBody.addEventListener("click", (event) => {
+  const button = event.target.closest("button");
+  if (!button) return;
+  const id = Number(button.dataset.id);
+  const item = stableReleases.find((row) => row.id === id);
+  if (!item) return;
+  if (button.dataset.action === "delete") openConfirmModal(id, "stable");
+});
+stableAddBtn.addEventListener("click", openStableModal);
+stableCancelBtn.addEventListener("click", closeStableModal);
+stableModal.addEventListener("click", (event) => {
+  if (event.target === stableModal) closeStableModal();
+});
+stableForm.addEventListener("submit", (event) => {
+  event.preventDefault();
+  saveStableRelease();
+});
+stableForm.elements.versionId.addEventListener("change", syncStableUpdateContent);
+stableForm.elements.updateContentId.addEventListener("change", () => {
+  const content = updateContents.find((item) => String(item.id) === stableForm.elements.updateContentId.value) || null;
+  writeStableContentEditor(updateContentLines(content));
+});
 internalBtn.addEventListener("click", showInternalList);
 internalListClose.addEventListener("click", hideInternalList);
 internalAddBtn.addEventListener("click", () => openInternalModal());
@@ -2459,6 +2854,22 @@ confirmOkBtn.addEventListener("click", () => {
     if (index >= 0) internalReleases.splice(index, 1);
     closeConfirmModal();
     renderInternalList();
+    return;
+  }
+
+  if (pendingDeleteTarget === "dev") {
+    const index = devReleases.findIndex((item) => item.id === pendingDeleteId);
+    if (index >= 0) devReleases.splice(index, 1);
+    closeConfirmModal();
+    renderDevList();
+    return;
+  }
+
+  if (pendingDeleteTarget === "stable") {
+    const index = stableReleases.findIndex((item) => item.id === pendingDeleteId);
+    if (index >= 0) stableReleases.splice(index, 1);
+    closeConfirmModal();
+    renderStableList();
     return;
   }
 

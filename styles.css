@@ -182,6 +182,36 @@ select {
   background: #4740c9;
 }
 
+.btn-dev {
+  height: 36px;
+  padding: 0 16px;
+  border: none;
+  border-radius: 6px;
+  color: #fff;
+  background: #1282a2;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.btn-dev:hover {
+  background: #0e6a85;
+}
+
+.btn-stable {
+  height: 36px;
+  padding: 0 16px;
+  border: none;
+  border-radius: 6px;
+  color: #fff;
+  background: #2f8f4e;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.btn-stable:hover {
+  background: #25723e;
+}
+
 .btn-record {
   height: 36px;
   padding: 0 16px;
@@ -275,6 +305,12 @@ select {
 .col-beta-updated { width: 11%; }
 .col-beta-status { width: 9%; }
 .col-beta-action { width: 22%; }
+.col-dev-name { width: 14%; }
+.col-dev-code { width: 10%; }
+.col-dev-link { width: 32%; }
+.col-dev-status { width: 12%; }
+.col-dev-time { width: 16%; }
+.col-dev-action { width: 16%; }
 .col-internal-check { width: 44px; }
 .col-internal-channel { width: 16%; }
 .col-internal-version { width: 15%; }
@@ -631,6 +667,13 @@ select {
 
 .field input[readonly] {
   background: #f7f8fa;
+}
+
+.field-note {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.5;
 }
 
 .field input,
@@ -1175,6 +1218,10 @@ select {
 #hotfixDialog { z-index: 30; }
 #hotfixPicker { z-index: 40; }
 #betaListMask { z-index: 25; }
+#devListMask { z-index: 25; }
+#devModal { z-index: 35; }
+#stableListMask { z-index: 25; }
+#stableModal { z-index: 35; }
 #betaModal { z-index: 35; }
 #internalListMask { z-index: 25; }
 #internalModal,

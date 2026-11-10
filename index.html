@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>管理后台</title>
-  <link rel="stylesheet" href="styles.css?v=38" />
+  <link rel="stylesheet" href="styles.css?v=43" />
 </head>
 <body>
   <div class="layout">
@@ -33,6 +33,8 @@
         <div class="topbar-actions">
           <button class="btn-beta" type="button" id="betaBtn">发布公测</button>
           <button class="btn-internal" type="button" id="internalBtn">发布内部渠道</button>
+          <button class="btn-dev" type="button" id="devBtn">发布开发版</button>
+          <button class="btn-stable" type="button" id="stableBtn">发布稳定版</button>
           <button class="btn-hotfix" type="button" id="hotfixBtn">发布热修复包</button>
           <button class="btn-primary" type="button" id="addBtn">新增</button>
         </div>
@@ -578,6 +580,238 @@
     </div>
   </div>
 
+  <div class="modal-mask" id="devListMask" hidden>
+    <div class="modal hotfix-shell" role="dialog" aria-modal="true" aria-labelledby="devListTitle">
+      <header class="hotfix-head">
+        <h2 class="modal-title" id="devListTitle">开发版列表</h2>
+        <div class="topbar-actions">
+          <button class="btn-dev" type="button" id="devAddBtn">新增开发版</button>
+          <button class="btn-ghost" type="button" id="devListClose">关闭</button>
+        </div>
+      </header>
+      <div class="hotfix-body">
+        <div class="panel">
+          <table class="data-table">
+            <colgroup>
+              <col class="col-dev-name" />
+              <col class="col-dev-code" />
+              <col class="col-dev-link" />
+              <col class="col-dev-status" />
+              <col class="col-dev-time" />
+              <col class="col-dev-action" />
+            </colgroup>
+            <thead>
+              <tr>
+                <th>版本名称</th>
+                <th>版本号</th>
+                <th>下载地址</th>
+                <th>发布状态</th>
+                <th>发布时间</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody id="devTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-mask" id="devModal" hidden>
+    <div class="modal internal-modal" role="dialog" aria-labelledby="devModalTitle" aria-modal="true">
+      <h2 class="modal-title" id="devModalTitle">新增开发版</h2>
+      <form id="devForm" novalidate>
+        <label class="field">
+          <span>游戏盒版本</span>
+          <select name="versionId" required>
+            <option value="" selected disabled>请选择游戏盒版本</option>
+          </select>
+        </label>
+        <label class="field">
+          <span>更新时间</span>
+          <input type="date" name="publishedAt" required />
+        </label>
+        <div class="field beta-switch">
+          <span>发布状态</span>
+          <div class="beta-switch-options" role="radiogroup" aria-label="发布状态">
+            <label>
+              <input type="radio" name="publishStatus" value="preview" checked />
+              <span>预览</span>
+            </label>
+            <label>
+              <input type="radio" name="publishStatus" value="published" />
+              <span>发布</span>
+            </label>
+          </div>
+        </div>
+        <label class="field">
+          <span>强制升级的版本号</span>
+          <input type="text" name="forceVersions" placeholder="请输入版本号" />
+          <p class="field-note">多个用英文逗号隔开</p>
+        </label>
+        <label class="field">
+          <span>强制升级的最大版本号</span>
+          <input type="text" name="forceMaxVersion" value="1691" />
+        </label>
+        <label class="field">
+          <span>升级允许的最小SdkVersion</span>
+          <input type="text" name="minSdkVersion" value="21" />
+        </label>
+        <label class="field">
+          <span>支持同版本升级</span>
+          <input type="text" name="sameVersionNames" placeholder="请输入版本名称" />
+          <p class="field-note">填写版本名称，多个用英文逗号隔开</p>
+        </label>
+        <label class="field">
+          <span>一句话描述</span>
+          <input type="text" name="summary" placeholder="请输入一句话描述" />
+        </label>
+        <div class="field beta-switch">
+          <span>是否展示红点</span>
+          <div class="beta-switch-options" role="radiogroup" aria-label="是否展示红点">
+            <label>
+              <input type="radio" name="showRedDot" value="yes" />
+              <span>是</span>
+            </label>
+            <label>
+              <input type="radio" name="showRedDot" value="no" checked />
+              <span>否</span>
+            </label>
+          </div>
+        </div>
+        <label class="field">
+          <span>更新内容</span>
+          <select name="updateContentId">
+            <option value="">请选择</option>
+          </select>
+        </label>
+        <p class="field-note">一行一条，可直接修改。</p>
+        <div class="internal-content-editor" id="devContentEditor" contenteditable="true" role="textbox" aria-multiline="true" aria-label="更新内容" data-placeholder="一行一条"></div>
+        <span class="hint" id="devHint" hidden></span>
+        <div class="modal-actions">
+          <button class="btn-ghost" type="button" id="devCancelBtn">取消</button>
+          <button class="btn-dev" type="submit">确定</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal-mask" id="stableListMask" hidden>
+    <div class="modal hotfix-shell" role="dialog" aria-modal="true" aria-labelledby="stableListTitle">
+      <header class="hotfix-head">
+        <h2 class="modal-title" id="stableListTitle">稳定版列表</h2>
+        <div class="topbar-actions">
+          <button class="btn-stable" type="button" id="stableAddBtn">新增稳定版</button>
+          <button class="btn-ghost" type="button" id="stableListClose">关闭</button>
+        </div>
+      </header>
+      <div class="hotfix-body">
+        <div class="panel">
+          <table class="data-table">
+            <colgroup>
+              <col class="col-dev-name" />
+              <col class="col-dev-code" />
+              <col class="col-dev-link" />
+              <col class="col-dev-status" />
+              <col class="col-dev-time" />
+              <col class="col-dev-action" />
+            </colgroup>
+            <thead>
+              <tr>
+                <th>版本名称</th>
+                <th>版本号</th>
+                <th>下载地址</th>
+                <th>发布状态</th>
+                <th>发布时间</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody id="stableTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-mask" id="stableModal" hidden>
+    <div class="modal internal-modal" role="dialog" aria-labelledby="stableModalTitle" aria-modal="true">
+      <h2 class="modal-title" id="stableModalTitle">新增稳定版</h2>
+      <form id="stableForm" novalidate>
+        <label class="field">
+          <span>游戏盒版本</span>
+          <select name="versionId" required>
+            <option value="" selected disabled>请选择游戏盒版本</option>
+          </select>
+        </label>
+        <label class="field">
+          <span>更新时间</span>
+          <input type="date" name="publishedAt" required />
+        </label>
+        <div class="field beta-switch">
+          <span>发布状态</span>
+          <div class="beta-switch-options" role="radiogroup" aria-label="发布状态">
+            <label>
+              <input type="radio" name="publishStatus" value="preview" checked />
+              <span>预览</span>
+            </label>
+            <label>
+              <input type="radio" name="publishStatus" value="published" />
+              <span>发布</span>
+            </label>
+          </div>
+        </div>
+        <label class="field">
+          <span>强制升级的版本号</span>
+          <input type="text" name="forceVersions" placeholder="请输入版本号" />
+          <p class="field-note">多个用英文逗号隔开</p>
+        </label>
+        <label class="field">
+          <span>强制升级的最大版本号</span>
+          <input type="text" name="forceMaxVersion" value="1691" />
+        </label>
+        <label class="field">
+          <span>升级允许的最小SdkVersion</span>
+          <input type="text" name="minSdkVersion" value="21" />
+        </label>
+        <label class="field">
+          <span>支持同版本升级</span>
+          <input type="text" name="sameVersionNames" placeholder="请输入版本名称" />
+          <p class="field-note">填写版本名称，多个用英文逗号隔开</p>
+        </label>
+        <label class="field">
+          <span>一句话描述</span>
+          <input type="text" name="summary" placeholder="请输入一句话描述" />
+        </label>
+        <div class="field beta-switch">
+          <span>是否展示红点</span>
+          <div class="beta-switch-options" role="radiogroup" aria-label="是否展示红点">
+            <label>
+              <input type="radio" name="showRedDot" value="yes" />
+              <span>是</span>
+            </label>
+            <label>
+              <input type="radio" name="showRedDot" value="no" checked />
+              <span>否</span>
+            </label>
+          </div>
+        </div>
+        <label class="field">
+          <span>更新内容</span>
+          <select name="updateContentId">
+            <option value="">请选择</option>
+          </select>
+        </label>
+        <p class="field-note">一行一条，可直接修改。</p>
+        <div class="internal-content-editor" id="stableContentEditor" contenteditable="true" role="textbox" aria-multiline="true" aria-label="更新内容" data-placeholder="一行一条"></div>
+        <span class="hint" id="stableHint" hidden></span>
+        <div class="modal-actions">
+          <button class="btn-ghost" type="button" id="stableCancelBtn">取消</button>
+          <button class="btn-stable" type="submit">确定</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <div class="modal-mask" id="internalListMask" hidden>
     <div class="modal hotfix-shell" role="dialog" aria-modal="true" aria-labelledby="internalListTitle">
       <header class="hotfix-head">
@@ -824,7 +1058,7 @@
   <div class="hotfix-toast" id="hotfixToast" role="status" hidden></div>
   <div class="hotfix-toast" id="betaToast" role="status" hidden></div>
 
-  <script src="app.js?v=48"></script>
+  <script src="app.js?v=56"></script>
   <script src="hotfix.js?v=9"></script>
 </body>
 </html>
