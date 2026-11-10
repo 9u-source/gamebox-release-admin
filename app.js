@@ -1236,7 +1236,7 @@ function renderDevList() {
     <td>${escapeHtml(item.code)}</td>
     <td>${item.link ? `<a href="${escapeHtml(item.link)}" target="_blank" rel="noopener noreferrer">${escapeHtml(item.link)}</a>` : ""}</td>
     <td><span class="update-mode ${item.publishStatus === "published" ? "is-published" : "is-preview"}">${item.publishStatus === "published" ? "发布" : "预览"}</span></td>
-    <td>${escapeHtml(item.publishedAt)}</td>
+    <td>${escapeHtml(String(item.publishedAt || "").slice(0, 10))}</td>
     <td class="action-cell">
       <button class="btn-link" type="button" data-action="config" data-id="${item.id}">配置</button>
       <button class="btn-link btn-link-danger" type="button" data-action="delete" data-id="${item.id}">删除</button>
@@ -1448,7 +1448,7 @@ function renderStableList() {
         <button class="btn-link" type="button" data-action="reheat" data-id="${item.id}">重新预热</button>
       </div>
     </td>
-    <td>${escapeHtml(item.publishedAt)}</td>
+    <td>${escapeHtml(String(item.publishedAt || "").slice(0, 10))}</td>
     <td class="action-cell">
       <button class="btn-link" type="button" data-action="config" data-id="${item.id}">配置</button>
       <button class="btn-link btn-link-danger" type="button" data-action="delete" data-id="${item.id}">删除</button>
