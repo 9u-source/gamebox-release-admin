@@ -392,6 +392,7 @@ const devReleases = [
   { id: 4, name: "9.6.2.3", code: "2394", link: "https://dlstest.img4399.com/redirect/ftp/client/appftp/9.6/tinker/9.6.2.3/dev_pub/4399Game_9.6.2.3.2394.apk", publishStatus: "published", publishedAt: "2026-10-11 11:18" },
 ];
 let nextDevId = 5;
+let editingDevId = null;
 
 const stableReleases = [
   { id: 1, name: "9.8.0.1", code: "2416", link: "https://dlstest.img4399.com/redirect/ftp/client/appftp/9.8/tinker/9.8.0.1/stable_pub/4399Game_9.8.0.1.2416.apk", publishStatus: "published", publishedAt: "2026-11-07 10:12" },
@@ -400,6 +401,7 @@ const stableReleases = [
   { id: 4, name: "9.6.2.1", code: "2390", link: "https://dlstest.img4399.com/redirect/ftp/client/appftp/9.6/tinker/9.6.2.1/stable_pub/4399Game_9.6.2.1.2390.apk", publishStatus: "preview", publishedAt: "2026-10-09 11:05" },
 ];
 let nextStableId = 5;
+let editingStableId = null;
 
 const betaReleases = [
   { id: 1, versionId: 1, popupTitle: "V9.7游戏盒公测活动", appName: "4399游戏盒V9.7", version: "9.7.0.30", size: "186.4 MB", downloadLink: "https://dlstest.img4399.com/redirect/ftp/client/appftp/9.7/tinker/9.7.0.30/release_pub/4399Game_9.7.0.30.2401.apk", publishStatus: "published", start: "2026-10-20 10:00", end: "2026-11-20 23:59", intro: "抢先体验全新首页和登录改版", entryScope: "all", homePopup: "yes", crowd: "97gongce", lowPercent: 20, midPercent: 20, highPercent: 20, ultraPercent: 20, targetVersions: "", updatedAt: "2026-10-23 18:26" },
@@ -491,6 +493,7 @@ const devListClose = document.getElementById("devListClose");
 const devTableBody = document.getElementById("devTableBody");
 const devAddBtn = document.getElementById("devAddBtn");
 const devModal = document.getElementById("devModal");
+const devModalTitle = document.getElementById("devModalTitle");
 const devForm = document.getElementById("devForm");
 const devContentEditor = document.getElementById("devContentEditor");
 const devHint = document.getElementById("devHint");
@@ -501,6 +504,7 @@ const stableListClose = document.getElementById("stableListClose");
 const stableTableBody = document.getElementById("stableTableBody");
 const stableAddBtn = document.getElementById("stableAddBtn");
 const stableModal = document.getElementById("stableModal");
+const stableModalTitle = document.getElementById("stableModalTitle");
 const stableForm = document.getElementById("stableForm");
 const stableContentEditor = document.getElementById("stableContentEditor");
 const stableHint = document.getElementById("stableHint");
@@ -1245,23 +1249,50 @@ function showDevHint(message) {
   devHint.hidden = !message;
 }
 
-function fillDevPackages() {
-  const select = devForm.elements.versionId;
-  select.innerHTML = `<option value="" selected disabled>请选择游戏盒版本</option>${versionRecords
-    .map((record) => `<option value="${record.id}">${escapeHtml(versionOptionLabel(record))}</option>`)
-    .join("")}`;
+function releasePackageChoice(record) {
+  const matched = releaseVersionId(record);
+  const options = versionRecords.map((item) => `<option value="${item.id}">${escapeHtml(versionOptionLabel(item))}</option>`);
+  if (record && !matched) {
+    const label = [record.name, record.code].filter(Boolean).join(" · ");
+    options.unshift(`<option value="current">${escapeHtml(label || "当前版本")}</option>`);
+  }
+  return { html: options.join(""), value: matched || (record ? "current" : "") };
 }
 
-function openDevModal() {
+function fillDevPackages(record) {
+  const select = devForm.elements.versionId;
+  const choice = releasePackageChoice(record);
+  select.innerHTML = `<option value=""${choice.value ? "" : " selected"} disabled>请选择游戏盒版本</option>${choice.html}`;
+  if (choice.value) select.value = choice.value;
+}
+
+function releaseVersionId(record) {
+  if (!record) return "";
+  if (record.versionId && versionRecords.some((item) => item.id === record.versionId)) return String(record.versionId);
+  const found = versionRecords.find((item) => item.name === record.name && item.code === record.code);
+  return found ? String(found.id) : "";
+}
+
+function openDevModal(record) {
+  editingDevId = record ? record.id : null;
+  devModalTitle.textContent = record ? "配置" : "新增开发版";
   devForm.reset();
   showDevHint("");
-  fillDevPackages();
-  devForm.elements.publishedAt.value = todayInputDate();
-  devForm.elements.publishStatus.value = "preview";
-  devForm.elements.forceMaxVersion.value = "1691";
-  devForm.elements.minSdkVersion.value = "21";
-  devForm.elements.showRedDot.value = "no";
+  fillDevPackages(record);
+  devForm.elements.publishedAt.value = record && record.publishedAt ? String(record.publishedAt).slice(0, 10) : todayInputDate();
+  devForm.elements.publishStatus.value = record && record.publishStatus === "published" ? "published" : "preview";
+  devForm.elements.forceVersions.value = record && record.forceVersions ? record.forceVersions : "";
+  devForm.elements.forceMaxVersion.value = record && record.forceMaxVersion ? record.forceMaxVersion : "1691";
+  devForm.elements.minSdkVersion.value = record && record.minSdkVersion ? record.minSdkVersion : "21";
+  devForm.elements.sameVersionNames.value = record && record.sameVersionNames ? record.sameVersionNames : "";
+  devForm.elements.summary.value = record && record.summary ? record.summary : "";
+  devForm.elements.showRedDot.value = record && record.showRedDot === "yes" ? "yes" : "no";
   syncDevUpdateContent();
+  if (record && (record.updateContentId || (record.updateLines && record.updateLines.length))) {
+    if (record.updateContentId) fillDevContentSelect(record.updateContentId);
+    const content = updateContents.find((item) => String(item.id) === devForm.elements.updateContentId.value) || null;
+    writeDevContentEditor(record.updateLines && record.updateLines.length ? record.updateLines : updateContentLines(content));
+  }
   devModal.hidden = false;
   devForm.elements.versionId.focus();
 }
@@ -1301,12 +1332,22 @@ function syncDevUpdateContent() {
 }
 
 function closeDevModal() {
+  editingDevId = null;
+  devModalTitle.textContent = "新增开发版";
   showDevHint("");
   devModal.hidden = true;
 }
 
+function selectedReleaseVersion(selectValue, existing) {
+  if (selectValue === "current" && existing) {
+    return { id: existing.versionId || null, name: existing.name, code: existing.code, link: existing.link };
+  }
+  return versionRecords.find((record) => String(record.id) === selectValue) || null;
+}
+
 function saveDevRelease() {
-  const version = versionRecords.find((record) => String(record.id) === devForm.elements.versionId.value);
+  const existing = editingDevId ? devReleases.find((item) => item.id === editingDevId) : null;
+  const version = selectedReleaseVersion(devForm.elements.versionId.value, existing);
   if (!version) {
     showDevHint("请选择游戏盒版本");
     devForm.elements.versionId.focus();
@@ -1342,8 +1383,8 @@ function saveDevRelease() {
     devForm.elements.sameVersionNames.focus();
     return;
   }
-  devReleases.unshift({
-    id: nextDevId,
+  const saved = {
+    id: editingDevId || nextDevId,
     versionId: version.id,
     name: version.name,
     code: version.code,
@@ -1358,11 +1399,18 @@ function saveDevRelease() {
     showRedDot: devForm.elements.showRedDot.value === "yes" ? "yes" : "no",
     updateContentId: Number(devForm.elements.updateContentId.value) || null,
     updateLines: readDevContentEditor(),
-  });
-  nextDevId += 1;
+  };
+  const editing = editingDevId;
+  if (editing) {
+    const index = devReleases.findIndex((item) => item.id === editing);
+    if (index >= 0) devReleases[index] = saved;
+  } else {
+    devReleases.unshift(saved);
+    nextDevId += 1;
+  }
   closeDevModal();
   renderDevList();
-  showBetaToast("已新增开发版");
+  showBetaToast(editing ? "已保存配置" : "已新增开发版");
 }
 
 function hideDevList() {
@@ -1399,23 +1447,33 @@ function showStableHint(message) {
   stableHint.hidden = !message;
 }
 
-function fillStablePackages() {
+function fillStablePackages(record) {
   const select = stableForm.elements.versionId;
-  select.innerHTML = `<option value="" selected disabled>请选择游戏盒版本</option>${versionRecords
-    .map((record) => `<option value="${record.id}">${escapeHtml(versionOptionLabel(record))}</option>`)
-    .join("")}`;
+  const choice = releasePackageChoice(record);
+  select.innerHTML = `<option value=""${choice.value ? "" : " selected"} disabled>请选择游戏盒版本</option>${choice.html}`;
+  if (choice.value) select.value = choice.value;
 }
 
-function openStableModal() {
+function openStableModal(record) {
+  editingStableId = record ? record.id : null;
+  stableModalTitle.textContent = record ? "配置" : "新增稳定版";
   stableForm.reset();
   showStableHint("");
-  fillStablePackages();
-  stableForm.elements.publishedAt.value = todayInputDate();
-  stableForm.elements.publishStatus.value = "preview";
-  stableForm.elements.forceMaxVersion.value = "1691";
-  stableForm.elements.minSdkVersion.value = "21";
-  stableForm.elements.showRedDot.value = "no";
+  fillStablePackages(record);
+  stableForm.elements.publishedAt.value = record && record.publishedAt ? String(record.publishedAt).slice(0, 10) : todayInputDate();
+  stableForm.elements.publishStatus.value = record && record.publishStatus === "published" ? "published" : "preview";
+  stableForm.elements.forceVersions.value = record && record.forceVersions ? record.forceVersions : "";
+  stableForm.elements.forceMaxVersion.value = record && record.forceMaxVersion ? record.forceMaxVersion : "1691";
+  stableForm.elements.minSdkVersion.value = record && record.minSdkVersion ? record.minSdkVersion : "21";
+  stableForm.elements.sameVersionNames.value = record && record.sameVersionNames ? record.sameVersionNames : "";
+  stableForm.elements.summary.value = record && record.summary ? record.summary : "";
+  stableForm.elements.showRedDot.value = record && record.showRedDot === "yes" ? "yes" : "no";
   syncStableUpdateContent();
+  if (record && (record.updateContentId || (record.updateLines && record.updateLines.length))) {
+    if (record.updateContentId) fillStableContentSelect(record.updateContentId);
+    const content = updateContents.find((item) => String(item.id) === stableForm.elements.updateContentId.value) || null;
+    writeStableContentEditor(record.updateLines && record.updateLines.length ? record.updateLines : updateContentLines(content));
+  }
   stableModal.hidden = false;
   stableForm.elements.versionId.focus();
 }
@@ -1446,12 +1504,15 @@ function syncStableUpdateContent() {
 }
 
 function closeStableModal() {
+  editingStableId = null;
+  stableModalTitle.textContent = "新增稳定版";
   showStableHint("");
   stableModal.hidden = true;
 }
 
 function saveStableRelease() {
-  const version = versionRecords.find((record) => String(record.id) === stableForm.elements.versionId.value);
+  const existing = editingStableId ? stableReleases.find((item) => item.id === editingStableId) : null;
+  const version = selectedReleaseVersion(stableForm.elements.versionId.value, existing);
   if (!version) {
     showStableHint("请选择游戏盒版本");
     stableForm.elements.versionId.focus();
@@ -1487,8 +1548,8 @@ function saveStableRelease() {
     stableForm.elements.sameVersionNames.focus();
     return;
   }
-  stableReleases.unshift({
-    id: nextStableId,
+  const saved = {
+    id: editingStableId || nextStableId,
     versionId: version.id,
     name: version.name,
     code: version.code,
@@ -1503,11 +1564,18 @@ function saveStableRelease() {
     showRedDot: stableForm.elements.showRedDot.value === "yes" ? "yes" : "no",
     updateContentId: Number(stableForm.elements.updateContentId.value) || null,
     updateLines: readStableContentEditor(),
-  });
-  nextStableId += 1;
+  };
+  const editing = editingStableId;
+  if (editing) {
+    const index = stableReleases.findIndex((item) => item.id === editing);
+    if (index >= 0) stableReleases[index] = saved;
+  } else {
+    stableReleases.unshift(saved);
+    nextStableId += 1;
+  }
   closeStableModal();
   renderStableList();
-  showBetaToast("已新增稳定版");
+  showBetaToast(editing ? "已保存配置" : "已新增稳定版");
 }
 
 function hideStableList() {
@@ -1986,6 +2054,7 @@ devTableBody.addEventListener("click", (event) => {
   const id = Number(button.dataset.id);
   const item = devReleases.find((row) => row.id === id);
   if (!item) return;
+  if (button.dataset.action === "config") openDevModal(item);
   if (button.dataset.action === "delete") openConfirmModal(id, "dev");
 });
 devAddBtn.addEventListener("click", openDevModal);
@@ -2013,6 +2082,7 @@ stableTableBody.addEventListener("click", (event) => {
   const id = Number(button.dataset.id);
   const item = stableReleases.find((row) => row.id === id);
   if (!item) return;
+  if (button.dataset.action === "config") openStableModal(item);
   if (button.dataset.action === "delete") openConfirmModal(id, "stable");
 });
 stableAddBtn.addEventListener("click", openStableModal);
