@@ -37,6 +37,7 @@ const versionRecords = [
     publisher: "张三",
     channel: "a4399",
     link: "https://dlstest.img4399.com/redirect/ftp/client/appftp/9.7/tinker/9.7.0.30/release_pub/4399Game_9.7.0.30.2401.apk",
+    parseId: "1002401",
     note: "修复启动闪退，优化首页加载",
   },
   {
@@ -48,6 +49,7 @@ const versionRecords = [
     publisher: "李四",
     channel: "gongce4399",
     link: "https://dlstest.img4399.com/redirect/ftp/client/appftp/9.6/tinker/9.6.1.12/release_pub/4399Game_9.6.1.12.2388.apk",
+    parseId: "1002388",
     note: "灰度验证登录改版",
   },
   {
@@ -59,6 +61,7 @@ const versionRecords = [
     publisher: "王五",
     channel: "youxi4399",
     link: "https://dlstest.img4399.com/redirect/ftp/client/appftp/9.6/tinker/9.6.0.8/release_pub/4399Game_9.6.0.8.2360.apk",
+    parseId: "1002360",
     note: "内测包，新增消息中心",
   },
   {
@@ -70,6 +73,7 @@ const versionRecords = [
     publisher: "张三",
     channel: "a4399",
     link: "https://dlstest.img4399.com/redirect/ftp/client/appftp/9.5/tinker/9.5.2.4/release_pub/4399Game_9.5.2.4.2291.apk",
+    parseId: "1002291",
     note: "修复支付结果页展示异常",
   },
 ];
@@ -410,6 +414,186 @@ const betaReleases = [
   { id: 4, versionId: 4, popupTitle: "V9.5游戏盒公测活动", appName: "4399游戏盒V9.5", version: "9.5.2.4", size: "165.1 MB", downloadLink: "https://dlstest.img4399.com/redirect/ftp/client/appftp/9.5/tinker/9.5.2.4/release_pub/4399Game_9.5.2.4.2291.apk", publishStatus: "published", start: "2026-08-18 10:00", end: "2026-09-18 23:59", intro: "稳定版功能回归", entryScope: "all", homePopup: "yes", crowd: "95gongce", lowPercent: 25, midPercent: 25, highPercent: 25, ultraPercent: 25, targetVersions: "5.4.1.29,9.5.2.4", updatedAt: "2026-08-18 14:15" },
 ];
 
+const externalRoutes = [
+  {
+    id: 1,
+    group: "渠道发布群",
+    webhook: "https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=channel-release",
+    copy: "{版本名称} 渠道包已打好，请查收。\n渠道：{渠道}",
+    mentions: ["张三", "李四"],
+    packages: [
+      { versionId: 1, channel: "huawei4399", passcode: "hw01", payload: "apk" },
+      { versionId: 1, channel: "xiaomi4399", payload: "link" },
+      { versionId: 2, channel: "oppo4399", payload: "parse" },
+    ],
+  },
+  {
+    id: 2,
+    group: "OPPO渠道群",
+    webhook: "https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=oppo-channel",
+    copy: "{版本名称} 安装包已发到群里。",
+    mentions: ["赵六", "钱七"],
+    packages: [
+      { versionId: 2, channel: "oppo4399", payload: "apk" },
+      { versionId: 3, channel: "vivo4399", payload: "apk" },
+    ],
+  },
+  {
+    id: 3,
+    group: "小米渠道群",
+    webhook: "https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=xiaomi-channel",
+    copy: "{版本名称} 已更新。\n渠道：{渠道}\n口令：{口令}\n下载：{下载地址}",
+    mentions: ["周敏", "孙涛"],
+    packages: [
+      { versionId: 1, channel: "xiaomi4399", passcode: "xm02", payload: "link" },
+      { versionId: 1, channel: "redmi4399", payload: "apk" },
+    ],
+  },
+  {
+    id: 4,
+    group: "vivo渠道群",
+    webhook: "https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=vivo-channel",
+    copy: "{版本名称} 渠道包请查收，解析id：{解析id}",
+    mentions: ["吴倩"],
+    packages: [
+      { versionId: 2, channel: "vivo4399", passcode: "vv03", payload: "parse" },
+      { versionId: 4, channel: "iqoo4399", payload: "apk" },
+    ],
+  },
+  {
+    id: 5,
+    group: "应用宝渠道群",
+    webhook: "https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=yyb-channel",
+    copy: "{版本名称}（{版本号}）已打好。\n渠道：{渠道}",
+    mentions: ["郑凯", "冯雪", "何磊"],
+    packages: [
+      { versionId: 1, channel: "yyb4399", passcode: "yyb01", payload: "apk" },
+      { versionId: 3, channel: "yyb4399", passcode: "yyb02", payload: "link" },
+    ],
+  },
+  {
+    id: 6,
+    group: "华为渠道群",
+    webhook: "https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=huawei-channel",
+    copy: "{版本名称} 华为包已发。\n渠道：{渠道} / {口令}",
+    mentions: ["陈静", "刘洋"],
+    packages: [
+      { versionId: 1, channel: "huawei4399", passcode: "hw02", payload: "apk" },
+      { versionId: 4, channel: "honor4399", payload: "parse" },
+    ],
+  },
+  {
+    id: 7,
+    group: "投放同步群",
+    webhook: "https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=ads-sync",
+    copy: "{渠道} {版本名称} 已同步，下载地址：{下载地址}",
+    mentions: ["马超"],
+    packages: [
+      { versionId: 3, channel: "baidu4399", payload: "link" },
+      { versionId: 2, channel: "meizu4399", passcode: "mz01", payload: "apk" },
+      { versionId: 4, channel: "samsung4399", payload: "parse" },
+    ],
+  },
+];
+let nextExternalRouteId = 8;
+let editingExternalId = null;
+
+const externalSends = [
+  {
+    id: 1,
+    sentAt: "2026-11-08 14:20",
+    versionName: "9.7.0.30",
+    status: "success",
+    config: [
+      {
+        group: "渠道发布群",
+        copy: "{版本名称} 渠道包已打好，请查收。\n渠道：{渠道}",
+        mentions: ["张三", "李四"],
+        packages: [
+          { versionId: 1, versionName: "9.7.0.30", channel: "huawei4399", passcode: "hw01", payload: "apk", ok: true },
+          { versionId: 1, versionName: "9.7.0.30", channel: "xiaomi4399", passcode: "", payload: "link", ok: true },
+        ],
+      },
+    ],
+    deliveries: [
+      {
+        group: "渠道发布群",
+        mentions: ["张三", "李四"],
+        items: [
+          { versionName: "9.7.0.30", channel: "huawei4399", passcode: "hw01", payload: "apk", content: "9.7.0.30 渠道包已打好，请查收。\n渠道：huawei4399\n安装包：https://dlstest.img4399.com/redirect/ftp/client/appftp/9.7/tinker/9.7.0.30/release_pub/4399Game_9.7.0.30.2401_huawei4399_hw01.apk", ok: true },
+          { versionName: "9.7.0.30", channel: "xiaomi4399", passcode: "", payload: "link", content: "9.7.0.30 渠道包已打好，请查收。\n渠道：xiaomi4399\n下载地址：https://dlstest.img4399.com/redirect/ftp/client/appftp/9.7/tinker/9.7.0.30/release_pub/4399Game_9.7.0.30.2401_xiaomi4399.apk", ok: true },
+        ],
+      },
+    ],
+  },
+  {
+    id: 2,
+    sentAt: "2026-10-31 09:15",
+    versionName: "9.6.1.12",
+    status: "partial",
+    config: [
+      {
+        group: "OPPO渠道群",
+        copy: "{版本名称} 安装包已发到群里。",
+        mentions: ["赵六", "钱七"],
+        packages: [
+          { versionId: 2, versionName: "9.6.1.12", channel: "oppo4399", passcode: "", payload: "apk", ok: true },
+        ],
+      },
+      {
+        group: "渠道发布群",
+        copy: "{版本名称} 渠道包已打好，请查收。\n渠道：{渠道}",
+        mentions: ["张三", "李四"],
+        packages: [
+          { versionId: 2, versionName: "9.6.1.12", channel: "oppo4399", passcode: "", payload: "apk", ok: false },
+        ],
+      },
+    ],
+    deliveries: [
+      {
+        group: "OPPO渠道群",
+        mentions: ["赵六", "钱七"],
+        items: [
+          { versionName: "9.6.1.12", channel: "oppo4399", passcode: "", payload: "apk", content: "9.6.1.12 安装包已发到群里。\n安装包：https://dlstest.img4399.com/redirect/ftp/client/appftp/9.6/tinker/9.6.1.12/release_pub/4399Game_9.6.1.12.2388_oppo4399.apk", ok: true },
+        ],
+      },
+      {
+        group: "渠道发布群",
+        mentions: ["张三", "李四"],
+        items: [
+          { versionName: "9.6.1.12", channel: "oppo4399", passcode: "", payload: "apk", content: "9.6.1.12 渠道包已打好，请查收。\n渠道：oppo4399\n安装包：https://dlstest.img4399.com/redirect/ftp/client/appftp/9.6/tinker/9.6.1.12/release_pub/4399Game_9.6.1.12.2388_oppo4399.apk", ok: false },
+        ],
+      },
+    ],
+  },
+  {
+    id: 3,
+    sentAt: "2026-10-12 16:40",
+    versionName: "9.6.0.8",
+    status: "failed",
+    config: [
+      {
+        group: "OPPO渠道群",
+        copy: "{版本名称} 安装包已发到群里。",
+        mentions: ["赵六", "钱七"],
+        packages: [
+          { versionId: 3, versionName: "9.6.0.8", channel: "vivo4399", passcode: "", payload: "apk", ok: false },
+        ],
+      },
+    ],
+    deliveries: [
+      {
+        group: "OPPO渠道群",
+        mentions: ["赵六", "钱七"],
+        items: [
+          { versionName: "9.6.0.8", channel: "vivo4399", passcode: "", payload: "apk", content: "9.6.0.8 安装包已发到群里。\n安装包：https://dlstest.img4399.com/redirect/ftp/client/appftp/9.6/tinker/9.6.0.8/release_pub/4399Game_9.6.0.8.2360_vivo4399.apk", ok: false },
+        ],
+      },
+    ],
+  },
+];
+let nextExternalSendId = 4;
+
 const internalChannels = [
   "a4399",
   "youxi4399",
@@ -499,6 +683,37 @@ const devContentEditor = document.getElementById("devContentEditor");
 const devHint = document.getElementById("devHint");
 const devCancelBtn = document.getElementById("devCancelBtn");
 const stableBtn = document.getElementById("stableBtn");
+const externalBtn = document.getElementById("externalBtn");
+const externalListMask = document.getElementById("externalListMask");
+const externalListClose = document.getElementById("externalListClose");
+const externalTableBody = document.getElementById("externalTableBody");
+const externalSnapshotMask = document.getElementById("externalSnapshotMask");
+const externalSnapshotClose = document.getElementById("externalSnapshotClose");
+const externalSnapshotTitle = document.getElementById("externalSnapshotTitle");
+const externalSnapshotBody = document.getElementById("externalSnapshotBody");
+const externalDetailMask = document.getElementById("externalDetailMask");
+const externalDetailClose = document.getElementById("externalDetailClose");
+const externalDetailBody = document.getElementById("externalDetailBody");
+const externalConfigBtn = document.getElementById("externalConfigBtn");
+const externalSendAllBtn = document.getElementById("externalSendAllBtn");
+const externalConfigMask = document.getElementById("externalConfigMask");
+const externalConfigClose = document.getElementById("externalConfigClose");
+const externalConfigBody = document.getElementById("externalConfigBody");
+const externalAddBtn = document.getElementById("externalAddBtn");
+const externalEditMask = document.getElementById("externalEditMask");
+const externalEditTitle = document.getElementById("externalEditTitle");
+const externalForm = document.getElementById("externalForm");
+const externalPackageList = document.getElementById("externalPackageList");
+const externalUnifyVersion = document.getElementById("externalUnifyVersion");
+const externalPackageAdd = document.getElementById("externalPackageAdd");
+const externalHint = document.getElementById("externalHint");
+const externalEditCancel = document.getElementById("externalEditCancel");
+const externalSendMask = document.getElementById("externalSendMask");
+const externalSendClose = document.getElementById("externalSendClose");
+const externalSendForm = document.getElementById("externalSendForm");
+const externalSendList = document.getElementById("externalSendList");
+const externalSendHint = document.getElementById("externalSendHint");
+const externalSendCancel = document.getElementById("externalSendCancel");
 const stableListMask = document.getElementById("stableListMask");
 const stableListClose = document.getElementById("stableListClose");
 const stableTableBody = document.getElementById("stableTableBody");
@@ -822,6 +1037,7 @@ function showPage(page) {
   hideInternalList();
   hideDevList();
   hideStableList();
+  hideExternalList();
   pageTitle.textContent = pages[page];
   versionPage.hidden = page !== "version";
   updatePage.hidden = page !== "update";
@@ -830,6 +1046,7 @@ function showPage(page) {
   internalBtn.hidden = page !== "version";
   devBtn.hidden = page !== "version";
   stableBtn.hidden = page !== "version";
+  externalBtn.hidden = page !== "version";
   hotfixBtn.hidden = page !== "version";
   if (!updateModal.hidden) closeUpdateModal();
 }
@@ -1027,6 +1244,7 @@ function openConfirmModal(id, target = "version") {
     dev: "确定要删除这条开发版记录吗？删除后不可恢复。",
     stable: "确定要删除这条稳定版记录吗？删除后不可恢复。",
     record: "确定要删除这条更新记录吗？删除后不可恢复。",
+    external: "确定要删除这条外部渠道配置吗？删除后不可恢复。",
     version: "确定要删除这条版本记录吗？删除后不可恢复。",
     update: "确定要删除这条更新内容吗？删除后不可恢复。",
   };
@@ -2158,6 +2376,491 @@ devForm.elements.updateContentId.addEventListener("change", () => {
   const content = updateContents.find((item) => String(item.id) === devForm.elements.updateContentId.value) || null;
   writeDevContentEditor(updateContentLines(content));
 });
+function externalStatusLabel(status) {
+  if (status === "success") return "执行成功";
+  if (status === "running") return "执行中";
+  if (status === "partial") return "部分成功";
+  return "执行失败";
+}
+
+function externalExecutionStatus(pkg) {
+  if (pkg.result === "running" || pkg.result === "success" || pkg.result === "failed") return pkg.result;
+  return pkg.ok ? "success" : "failed";
+}
+
+function externalPayloadLabel(payload) {
+  if (payload === "link") return "下载链接";
+  if (payload === "parse") return "解析id";
+  return "安装包";
+}
+
+function externalMentionLines(value) {
+  const names = [];
+  String(value || "").split(/\r?\n/).forEach((line) => {
+    const name = line.trim();
+    if (name && !names.includes(name)) names.push(name);
+  });
+  return names;
+}
+
+function externalCopyPreview(copy) {
+  return String(copy || "").split(/\r?\n/).map((line) => line.trim()).find(Boolean) || "";
+}
+
+function externalChannelLink(version, channel, passcode) {
+  const link = version.link || "";
+  const stamp = passcode ? `${channel}_${passcode}` : channel;
+  return link.replace(/\.apk/i, `_${stamp}.apk`);
+}
+
+function fillExternalCopy(template, version, channel, passcode, link, parseId) {
+  return String(template || "")
+    .split("{版本名称}").join(version.name)
+    .split("{版本号}").join(version.code)
+    .split("{下载地址}").join(link)
+    .split("{渠道}").join(channel)
+    .split("{口令}").join(passcode || "")
+    .split("{解析id}").join(parseId || "");
+}
+
+function externalSentText(item) {
+  const channel = item.passcode ? `${item.channel} / ${item.passcode}` : item.channel;
+  return `${item.versionName} · ${channel} · ${externalPayloadLabel(item.payload)}`;
+}
+
+function renderExternalList() {
+  if (externalSends.length === 0) {
+    externalTableBody.innerHTML = '<tr><td class="empty" colspan="4">暂无发送记录</td></tr>';
+    return;
+  }
+  externalTableBody.innerHTML = externalSends.map((item) => `<tr>
+    <td>${escapeHtml(item.sentAt)}</td>
+    <td>${escapeHtml(item.versionName)}</td>
+    <td><span class="update-mode is-${item.status}">${externalStatusLabel(item.status)}</span></td>
+    <td class="action-cell"><button class="btn-link" type="button" data-action="config" data-id="${item.id}">查看</button></td>
+  </tr>`).join("");
+}
+
+function externalConfigPackageText(pkg) {
+  const version = pkg.versionId ? externalVersionOf(pkg.versionId) : null;
+  const name = pkg.versionName || (version ? version.name : "未选版本");
+  const channel = pkg.passcode ? `${pkg.channel} / ${pkg.passcode}` : pkg.channel;
+  return `${name} · ${channel} · ${externalPayloadLabel(pkg.payload)}`;
+}
+
+function openExternalSnapshot(item) {
+  const rows = item.config || [];
+  externalSnapshotTitle.textContent = `${item.sentAt} 的渠道配置`;
+  externalSnapshotBody.innerHTML = rows.length ? rows.map((row) => {
+    const mentions = row.mentions && row.mentions.length ? row.mentions.join("、") : "";
+    const packages = (row.packages || []).map((pkg) => escapeHtml(externalConfigPackageText(pkg))).join("\n");
+    const statuses = (row.packages || []).map((pkg) => {
+      const status = externalExecutionStatus(pkg);
+      return `<div class="external-snapshot-status"><span class="update-mode is-${status}">${externalStatusLabel(status)}</span></div>`;
+    }).join("");
+    const preview = externalCopyPreview(row.copy);
+    return `<tr>
+      <td>${escapeHtml(row.group)}</td>
+      <td class="external-package-cell">${packages}</td>
+      <td>${escapeHtml(mentions)}</td>
+      <td class="external-copy-cell" title="${escapeHtml(row.copy)}">${escapeHtml(preview)}</td>
+      <td>${statuses}</td>
+    </tr>`;
+  }).join("") : '<tr><td class="empty" colspan="5">这次没有渠道配置</td></tr>';
+  externalSnapshotMask.hidden = false;
+  externalSnapshotClose.focus();
+}
+
+function closeExternalSnapshot() {
+  externalSnapshotMask.hidden = true;
+}
+
+function openExternalDetail(item) {
+  const deliveries = item.deliveries || [];
+  externalDetailBody.innerHTML = deliveries.length ? deliveries.map((delivery) => {
+    const people = delivery.mentions.length ? delivery.mentions.join("、") : "没有 @ 人";
+    const items = delivery.items.map((sent) => `<li>
+      <div class="external-detail-line">${escapeHtml(externalSentText(sent))}<span class="update-mode is-${sent.ok ? "success" : "failed"}">${sent.ok ? "执行成功" : "执行失败"}</span></div>
+      <pre class="external-detail-content">${escapeHtml(sent.content)}</pre>
+    </li>`).join("");
+    return `<section class="external-detail-group">
+      <h3>${escapeHtml(delivery.group)}</h3>
+      <p>@ ${escapeHtml(people)}</p>
+      <ul>${items}</ul>
+    </section>`;
+  }).join("") : '<p class="empty">这次没有发出内容</p>';
+  externalDetailMask.hidden = false;
+  externalDetailClose.focus();
+}
+
+function closeExternalDetail() {
+  externalDetailMask.hidden = true;
+}
+
+function showExternalList() {
+  externalListMask.hidden = false;
+  renderExternalList();
+  externalListClose.focus();
+}
+
+function hideExternalList() {
+  if (!externalSnapshotMask.hidden) closeExternalSnapshot();
+  if (!externalDetailMask.hidden) closeExternalDetail();
+  if (!externalEditMask.hidden) closeExternalEdit();
+  if (!externalSendMask.hidden) closeExternalSend();
+  if (!externalConfigMask.hidden) closeExternalConfig();
+  externalListMask.hidden = true;
+}
+
+function externalVersionOptions(versionId, blankLabel) {
+  const current = versionId ? String(versionId) : "";
+  const label = blankLabel || "请选择游戏盒版本";
+  return `<option value=""${blankLabel ? "" : " disabled"}${current ? "" : " selected"}>${escapeHtml(label)}</option>${versionRecords
+    .map((record) => `<option value="${record.id}"${String(record.id) === current ? " selected" : ""}>${escapeHtml(versionOptionLabel(record))}</option>`)
+    .join("")}`;
+}
+
+function sharedExternalVersion(packages) {
+  const rows = packages || [];
+  if (!rows.length || rows.some((pkg) => !pkg.versionId)) return "";
+  const versionId = rows[0].versionId;
+  return rows.every((pkg) => pkg.versionId === versionId) ? String(versionId) : "";
+}
+
+function renderExternalUnify(versionId) {
+  externalUnifyVersion.innerHTML = externalVersionOptions(versionId, "各包单独选择");
+}
+
+function syncExternalUnifyFromRows() {
+  const values = [...externalPackageList.querySelectorAll(".external-package-version")].map((select) => select.value);
+  const same = values.length > 0 && values.every((value) => value && value === values[0]);
+  externalUnifyVersion.value = same ? values[0] : "";
+}
+
+function externalVersionOf(versionId) {
+  return versionRecords.find((record) => record.id === Number(versionId)) || null;
+}
+
+function externalPackageText(pkg) {
+  const version = externalVersionOf(pkg.versionId);
+  const channel = pkg.passcode ? `${pkg.channel} / ${pkg.passcode}` : pkg.channel;
+  return `${version ? version.name : "未选版本"} · ${channel} · ${externalPayloadLabel(pkg.payload)}`;
+}
+
+function externalPackageRow(pkg) {
+  const versionId = pkg && pkg.versionId ? pkg.versionId : "";
+  const channel = pkg && pkg.channel ? pkg.channel : "";
+  const passcode = pkg && pkg.passcode ? pkg.passcode : "";
+  const payload = pkg && (pkg.payload === "link" || pkg.payload === "parse") ? pkg.payload : "apk";
+  return `<div class="external-package-row">
+    <select class="external-package-version" aria-label="游戏盒版本">${externalVersionOptions(versionId)}</select>
+    <input class="external-package-channel" type="text" value="${escapeHtml(channel)}" placeholder="渠道号" aria-label="渠道" />
+    <input class="external-package-passcode" type="text" value="${escapeHtml(passcode)}" placeholder="口令" aria-label="口令" />
+    <select class="external-package-payload" aria-label="发送内容">
+      <option value="apk"${payload === "apk" ? " selected" : ""}>安装包</option>
+      <option value="link"${payload === "link" ? " selected" : ""}>下载链接</option>
+      <option value="parse"${payload === "parse" ? " selected" : ""}>解析id</option>
+    </select>
+    <button class="btn-link btn-link-danger" type="button" data-remove>删除</button>
+  </div>`;
+}
+
+function renderExternalPackages(packages) {
+  const rows = packages && packages.length ? packages : [{}];
+  externalPackageList.innerHTML = rows.map((pkg) => externalPackageRow(pkg)).join("");
+}
+
+function readExternalPackages() {
+  const packages = [];
+  externalPackageList.querySelectorAll(".external-package-row").forEach((row) => {
+    packages.push({
+      versionId: Number(row.querySelector(".external-package-version").value) || null,
+      channel: row.querySelector(".external-package-channel").value.trim(),
+      passcode: row.querySelector(".external-package-passcode").value.trim(),
+      payload: ["link", "parse"].includes(row.querySelector(".external-package-payload").value) ? row.querySelector(".external-package-payload").value : "apk",
+    });
+  });
+  return packages;
+}
+
+function renderExternalConfig() {
+  if (externalRoutes.length === 0) {
+    externalConfigBody.innerHTML = '<tr><td class="empty" colspan="5">暂无渠道配置</td></tr>';
+    return;
+  }
+  externalConfigBody.innerHTML = externalRoutes.map((item) => {
+    const mentions = item.mentions.length ? item.mentions.join("、") : "";
+    const packages = (item.packages || []).map((pkg) => escapeHtml(externalPackageText(pkg))).join("\n");
+    const preview = externalCopyPreview(item.copy);
+    return `<tr>
+      <td>${escapeHtml(item.group)}</td>
+      <td class="external-package-cell">${packages}</td>
+      <td>${escapeHtml(mentions)}</td>
+      <td class="external-copy-cell" title="${escapeHtml(item.copy)}">${escapeHtml(preview)}</td>
+      <td class="action-cell">
+        <button class="btn-link" type="button" data-action="send" data-id="${item.id}">发送</button>
+        <button class="btn-link" type="button" data-action="edit" data-id="${item.id}">编辑</button>
+        <button class="btn-link btn-link-danger" type="button" data-action="delete" data-id="${item.id}">删除</button>
+      </td>
+    </tr>`;
+  }).join("");
+}
+
+function showExternalConfig() {
+  externalConfigMask.hidden = false;
+  renderExternalConfig();
+  externalConfigClose.focus();
+}
+
+function closeExternalConfig() {
+  if (!externalEditMask.hidden) closeExternalEdit();
+  externalConfigMask.hidden = true;
+}
+
+function showExternalHint(message) {
+  externalHint.textContent = message;
+  externalHint.hidden = !message;
+}
+
+function openExternalEdit(item) {
+  editingExternalId = item ? item.id : null;
+  externalEditTitle.textContent = item ? "编辑群" : "新增群";
+  externalForm.reset();
+  showExternalHint("");
+  renderExternalPackages(item ? item.packages : []);
+  renderExternalUnify(sharedExternalVersion(item ? item.packages : []));
+  if (item) {
+    externalForm.elements.group.value = item.group;
+    externalForm.elements.webhook.value = item.webhook || "";
+    externalForm.elements.copy.value = item.copy;
+    externalForm.elements.mentions.value = item.mentions.join("\n");
+  }
+  externalEditMask.hidden = false;
+  externalForm.elements.group.focus();
+}
+
+function closeExternalEdit() {
+  editingExternalId = null;
+  showExternalHint("");
+  externalEditMask.hidden = true;
+}
+
+function saveExternalRoute() {
+  const group = externalForm.elements.group.value.trim();
+  const webhook = externalForm.elements.webhook.value.trim();
+  const packages = readExternalPackages();
+  const copy = externalForm.elements.copy.value.trim();
+  const mentions = externalMentionLines(externalForm.elements.mentions.value);
+  if (!group) {
+    showExternalHint("请填写群聊");
+    externalForm.elements.group.focus();
+    return;
+  }
+  if (!webhook) {
+    showExternalHint("请填写 webhook 链接");
+    externalForm.elements.webhook.focus();
+    return;
+  }
+  if (!/^https?:\/\//i.test(webhook)) {
+    showExternalHint("webhook 链接需要以 http:// 或 https:// 开头");
+    externalForm.elements.webhook.focus();
+    return;
+  }
+  if (packages.length === 0) {
+    showExternalHint("请至少添加一个渠道包");
+    return;
+  }
+  const seen = new Set();
+  for (const pkg of packages) {
+    if (!pkg.versionId) {
+      showExternalHint("请选择游戏盒版本");
+      return;
+    }
+    if (!pkg.channel) {
+      showExternalHint("请填写渠道");
+      return;
+    }
+    const key = `${pkg.versionId}:${pkg.channel}:${pkg.passcode}`;
+    if (seen.has(key)) {
+      showExternalHint("同一个版本的渠道和口令不能重复");
+      return;
+    }
+    seen.add(key);
+  }
+  if (!copy) {
+    showExternalHint("请填写文案");
+    externalForm.elements.copy.focus();
+    return;
+  }
+  const duplicated = externalRoutes.some((item) => item.id !== editingExternalId && item.group === group);
+  if (duplicated) {
+    showExternalHint("该群聊已存在");
+    return;
+  }
+  if (editingExternalId) {
+    const item = externalRoutes.find((row) => row.id === editingExternalId);
+    if (item) Object.assign(item, { group, webhook, packages, copy, mentions });
+  } else {
+    externalRoutes.push({ id: nextExternalRouteId++, group, webhook, packages, copy, mentions });
+  }
+  closeExternalEdit();
+  renderExternalConfig();
+  showBetaToast("已保存渠道配置");
+}
+
+function showExternalSendHint(message) {
+  externalSendHint.textContent = message;
+  externalSendHint.hidden = !message;
+}
+
+function renderExternalSendList() {
+  if (externalRoutes.length === 0) {
+    externalSendList.innerHTML = '<p class="empty">请先在渠道配置里新增</p>';
+    return;
+  }
+  externalSendList.innerHTML = externalRoutes.map((item) => {
+    const mentions = item.mentions.length ? ` · @${item.mentions.join("、")}` : "";
+    const packages = (item.packages || []).map((pkg) => `<li>${escapeHtml(externalPackageText(pkg))}</li>`).join("");
+    return `<div class="external-send-row">
+      <label class="external-send-head">
+        <input class="external-send-check" type="checkbox" data-id="${item.id}" checked />
+        <span>${escapeHtml(item.group)}</span>
+        <span class="external-send-meta">${escapeHtml(mentions.replace(/^ · /, ""))}</span>
+      </label>
+      <ul class="external-send-packages">${packages}</ul>
+      <textarea aria-label="${escapeHtml(item.group)}文案">${escapeHtml(item.copy)}</textarea>
+      <label class="external-send-save">
+        <input class="external-send-keep" type="checkbox" />
+        <span>存为默认文案</span>
+      </label>
+    </div>`;
+  }).join("");
+}
+
+function openExternalSend() {
+  if (externalRoutes.length === 0) {
+    showBetaToast("请先配置渠道");
+    showExternalConfig();
+    return;
+  }
+  showExternalSendHint("");
+  renderExternalSendList();
+  externalSendMask.hidden = false;
+  externalSendClose.focus();
+}
+
+function closeExternalSend() {
+  showExternalSendHint("");
+  externalSendMask.hidden = true;
+}
+
+function externalSendProblem(picked) {
+  if (picked.some((item) => !(item.route.packages || []).length)) return "请先为群添加渠道包";
+  if (picked.some((item) => item.route.packages.some((pkg) => !externalVersionOf(pkg.versionId) || !pkg.channel))) return "请先补全渠道包的版本和渠道";
+  if (picked.some((item) => !item.copy)) return "请填写文案";
+  return "";
+}
+
+function recordExternalSend(picked) {
+  const results = [];
+  const versionNames = [];
+  const deliveries = picked.map((item) => {
+    if (item.saveDefault) item.route.copy = item.copy;
+    const sentItems = item.route.packages.map((pkg) => {
+      const version = externalVersionOf(pkg.versionId);
+      const link = externalChannelLink(version, pkg.channel, pkg.passcode);
+      const parseId = version.parseId || "";
+      const message = fillExternalCopy(item.copy, version, pkg.channel, pkg.passcode, link, parseId);
+      const delivered = pkg.payload === "apk" ? link : pkg.payload === "parse" ? parseId : message;
+      const ok = Boolean(delivered);
+      const content = pkg.payload === "apk"
+        ? `${message}\n安装包：${link}`
+        : pkg.payload === "parse"
+          ? `${message}\n解析id：${parseId}`
+          : message;
+      results.push({ ok });
+      if (!versionNames.includes(version.name)) versionNames.push(version.name);
+      return {
+        versionName: version.name,
+        channel: pkg.channel,
+        passcode: pkg.passcode || "",
+        payload: pkg.payload,
+        content,
+        ok,
+      };
+    });
+    return { group: item.route.group, mentions: item.route.mentions.slice(), items: sentItems };
+  });
+  const okCount = results.filter((item) => item.ok).length;
+  const status = okCount === results.length ? "success" : okCount === 0 ? "failed" : "partial";
+  externalSends.unshift({
+    id: nextExternalSendId++,
+    sentAt: betaStamp(),
+    versionName: versionNames.join("、"),
+    status,
+    config: picked.map((item, index) => ({
+      group: item.route.group,
+      copy: item.copy,
+      mentions: item.route.mentions.slice(),
+      packages: item.route.packages.map((pkg, pkgIndex) => {
+        const version = externalVersionOf(pkg.versionId);
+        return {
+          versionId: pkg.versionId,
+          versionName: version ? version.name : "",
+          channel: pkg.channel,
+          passcode: pkg.passcode || "",
+          payload: pkg.payload,
+          ok: deliveries[index].items[pkgIndex].ok,
+          result: deliveries[index].items[pkgIndex].ok ? "success" : "failed",
+        };
+      }),
+    })),
+    deliveries,
+  });
+  renderExternalList();
+  showBetaToast(status === "success" ? "发送成功" : status === "failed" ? "发送失败" : "部分发送成功");
+}
+
+function sendExternalRoutes(routes) {
+  if (!routes.length) {
+    showBetaToast("请先配置渠道");
+    return;
+  }
+  const picked = routes.map((route) => ({ route, copy: String(route.copy || "").trim(), saveDefault: false }));
+  const problem = externalSendProblem(picked);
+  if (problem) {
+    showBetaToast(problem);
+    return;
+  }
+  recordExternalSend(picked);
+}
+
+function submitExternalSend() {
+  const picked = [];
+  externalSendList.querySelectorAll(".external-send-row").forEach((row) => {
+    const check = row.querySelector(".external-send-check");
+    if (!check || !check.checked) return;
+    const route = externalRoutes.find((item) => item.id === Number(check.dataset.id));
+    if (!route) return;
+    picked.push({
+      route,
+      copy: row.querySelector("textarea").value.trim(),
+      saveDefault: row.querySelector(".external-send-keep").checked,
+    });
+  });
+  if (picked.length === 0) {
+    showExternalSendHint("请至少选择一个群");
+    return;
+  }
+  const problem = externalSendProblem(picked);
+  if (problem) {
+    showExternalSendHint(problem);
+    return;
+  }
+  recordExternalSend(picked);
+  closeExternalSend();
+}
+
 stableBtn.addEventListener("click", showStableList);
 stableListClose.addEventListener("click", hideStableList);
 stableListMask.addEventListener("click", (event) => {
@@ -2196,6 +2899,89 @@ stableForm.elements.updateContentId.addEventListener("change", () => {
   const content = updateContents.find((item) => String(item.id) === stableForm.elements.updateContentId.value) || null;
   writeStableContentEditor(updateContentLines(content));
 });
+externalBtn.addEventListener("click", showExternalList);
+externalListClose.addEventListener("click", hideExternalList);
+externalTableBody.addEventListener("click", (event) => {
+  const button = event.target.closest("button");
+  if (!button) return;
+  const item = externalSends.find((row) => row.id === Number(button.dataset.id));
+  if (!item) return;
+  if (button.dataset.action === "config") openExternalSnapshot(item);
+});
+externalSnapshotClose.addEventListener("click", closeExternalSnapshot);
+externalSnapshotMask.addEventListener("click", (event) => {
+  if (event.target === externalSnapshotMask) closeExternalSnapshot();
+});
+externalDetailClose.addEventListener("click", closeExternalDetail);
+externalDetailMask.addEventListener("click", (event) => {
+  if (event.target === externalDetailMask) closeExternalDetail();
+});
+externalListMask.addEventListener("click", (event) => {
+  if (event.target === externalListMask) hideExternalList();
+});
+externalConfigBtn.addEventListener("click", showExternalConfig);
+externalConfigClose.addEventListener("click", closeExternalConfig);
+externalConfigMask.addEventListener("click", (event) => {
+  if (event.target === externalConfigMask) closeExternalConfig();
+});
+externalAddBtn.addEventListener("click", () => openExternalEdit());
+externalPackageAdd.addEventListener("click", () => {
+  showExternalHint("");
+  const versionId = Number(externalUnifyVersion.value) || null;
+  externalPackageList.insertAdjacentHTML("beforeend", externalPackageRow(versionId ? { versionId } : {}));
+});
+externalUnifyVersion.addEventListener("change", () => {
+  showExternalHint("");
+  const versionId = externalUnifyVersion.value;
+  if (!versionId) return;
+  externalPackageList.querySelectorAll(".external-package-version").forEach((select) => {
+    select.value = versionId;
+  });
+});
+externalPackageList.addEventListener("change", (event) => {
+  if (!event.target.closest(".external-package-version")) return;
+  syncExternalUnifyFromRows();
+});
+externalPackageList.addEventListener("click", (event) => {
+  const button = event.target.closest("[data-remove]");
+  if (!button) return;
+  const rows = externalPackageList.querySelectorAll(".external-package-row");
+  if (rows.length <= 1) {
+    showExternalHint("至少保留一个渠道包");
+    return;
+  }
+  button.closest(".external-package-row").remove();
+  syncExternalUnifyFromRows();
+});
+externalConfigBody.addEventListener("click", (event) => {
+  const button = event.target.closest("button");
+  if (!button) return;
+  const item = externalRoutes.find((row) => row.id === Number(button.dataset.id));
+  if (!item) return;
+  if (button.dataset.action === "send") sendExternalRoutes([item]);
+  if (button.dataset.action === "edit") openExternalEdit(item);
+  if (button.dataset.action === "delete") openConfirmModal(item.id, "external");
+});
+externalEditCancel.addEventListener("click", closeExternalEdit);
+externalEditMask.addEventListener("click", (event) => {
+  if (event.target === externalEditMask) closeExternalEdit();
+});
+externalForm.addEventListener("submit", (event) => {
+  event.preventDefault();
+  saveExternalRoute();
+});
+externalForm.addEventListener("input", () => showExternalHint(""));
+externalSendAllBtn.addEventListener("click", () => sendExternalRoutes(externalRoutes.slice()));
+externalSendClose.addEventListener("click", closeExternalSend);
+externalSendCancel.addEventListener("click", closeExternalSend);
+externalSendMask.addEventListener("click", (event) => {
+  if (event.target === externalSendMask) closeExternalSend();
+});
+externalSendForm.addEventListener("submit", (event) => {
+  event.preventDefault();
+  submitExternalSend();
+});
+externalSendForm.addEventListener("input", () => showExternalSendHint(""));
 internalBtn.addEventListener("click", showInternalList);
 internalListClose.addEventListener("click", hideInternalList);
 internalAddBtn.addEventListener("click", () => openInternalModal());
@@ -3045,6 +3831,14 @@ confirmOkBtn.addEventListener("click", () => {
     if (index >= 0) updateContents.splice(index, 1);
     closeConfirmModal();
     renderUpdateList();
+    return;
+  }
+
+  if (pendingDeleteTarget === "external") {
+    const index = externalRoutes.findIndex((item) => item.id === pendingDeleteId);
+    if (index >= 0) externalRoutes.splice(index, 1);
+    closeConfirmModal();
+    renderExternalConfig();
     return;
   }
 

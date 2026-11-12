@@ -443,6 +443,16 @@ select {
   background: #fff1f0;
 }
 
+.update-mode.is-partial {
+  color: #d48806;
+  background: #fff7e6;
+}
+
+.update-mode.is-running {
+  color: #1677ff;
+  background: #e6f4ff;
+}
+
 .update-mode.is-pending {
   color: #646a73;
   background: #f2f3f5;
@@ -645,6 +655,10 @@ select {
 
 .modal-mask[hidden] {
   display: none;
+}
+
+#confirmModal {
+  z-index: 2;
 }
 
 .modal {
@@ -1303,6 +1317,206 @@ select {
 
 .internal-modal {
   width: min(640px, calc(100vw - 48px));
+}
+
+.col-external-time { width: 28%; }
+.col-external-version { width: 36%; }
+.col-external-status { width: 18%; }
+.col-external-view { width: 18%; }
+
+#externalSnapshotMask,
+#externalDetailMask { z-index: 3; }
+
+.col-external-snapshot-group { width: 16%; }
+.col-external-snapshot-package { width: 34%; }
+.col-external-snapshot-mention { width: 16%; }
+.col-external-snapshot-copy { width: 20%; }
+.col-external-snapshot-status { width: 14%; }
+
+.external-snapshot-status + .external-snapshot-status { margin-top: 6px; }
+
+.external-detail-shell { width: min(760px, calc(100vw - 48px)); }
+
+.external-detail-group + .external-detail-group {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
+}
+
+.external-detail-group h3 {
+  margin: 0 0 6px;
+  font-size: 16px;
+}
+
+.external-detail-group p,
+.external-detail-group ul {
+  margin: 0;
+}
+
+.external-detail-group p { color: var(--muted); }
+
+.external-detail-group ul {
+  padding: 0;
+  list-style: none;
+}
+
+.external-detail-line {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.external-detail-content {
+  margin: 6px 0 0;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font: inherit;
+  font-size: 13px;
+  line-height: 1.6;
+}
+.col-external-group { width: 14%; }
+.col-external-package { width: 34%; }
+.col-external-mention { width: 16%; }
+.col-external-copy { width: 16%; }
+.col-external-action { width: 20%; }
+
+.external-package-cell {
+  white-space: pre-line;
+}
+
+#externalEditMask .internal-modal {
+  width: min(920px, calc(100vw - 48px));
+}
+
+.external-package-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.external-package-unify {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.external-package-unify span {
+  flex: none;
+  color: var(--muted);
+}
+
+.external-package-unify select {
+  flex: 1;
+  width: auto;
+  min-width: 0;
+}
+
+.external-package-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.external-package-row select,
+.external-package-row input {
+  min-width: 0;
+  height: 36px;
+  padding: 0 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-size: 14px;
+}
+
+.external-package-version { flex: 1.5; }
+.external-package-channel { flex: 1; }
+.external-package-passcode { flex: 0.8; }
+.external-package-payload { flex: 0.85; }
+
+.external-package-add {
+  margin-top: 8px;
+}
+
+.external-send-packages {
+  margin: 0 0 8px;
+  padding-left: 28px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.external-version-picks {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.external-version-picks label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.external-copy-cell {
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.external-send-shell {
+  width: min(760px, calc(100vw - 48px));
+}
+
+.external-send-form {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.external-send-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.external-send-row {
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+.external-send-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  font-size: 14px;
+}
+
+.external-send-meta {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.external-send-row textarea {
+  min-height: 72px;
+}
+
+.external-send-save {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+  color: var(--text);
+  font-size: 13px;
 }
 
 .internal-content-note {

@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>管理后台</title>
-  <link rel="stylesheet" href="styles.css?v=49" />
+  <link rel="stylesheet" href="styles.css?v=61" />
 </head>
 <body>
   <div class="layout">
@@ -35,6 +35,7 @@
           <button class="btn-internal" type="button" id="internalBtn">发布内部渠道</button>
           <button class="btn-dev" type="button" id="devBtn">发布开发版</button>
           <button class="btn-stable" type="button" id="stableBtn">发布稳定版</button>
+          <button class="btn-internal" type="button" id="externalBtn">外部渠道</button>
           <button class="btn-hotfix" type="button" id="hotfixBtn">发布热修复包</button>
           <button class="btn-primary" type="button" id="addBtn">新增</button>
         </div>
@@ -1069,10 +1070,185 @@
     </div>
   </div>
 
+  <div class="modal-mask" id="externalListMask" hidden>
+    <div class="modal hotfix-shell" role="dialog" aria-modal="true" aria-labelledby="externalListTitle">
+      <header class="hotfix-head">
+        <h2 class="modal-title" id="externalListTitle">外部渠道</h2>
+        <div class="topbar-actions">
+          <button class="btn-internal" type="button" id="externalConfigBtn">渠道配置</button>
+          <button class="btn-ghost" type="button" id="externalListClose">关闭</button>
+        </div>
+      </header>
+      <div class="hotfix-body">
+        <div class="panel">
+          <table class="data-table">
+            <colgroup>
+              <col class="col-external-time" />
+              <col class="col-external-version" />
+              <col class="col-external-status" />
+              <col class="col-external-view" />
+            </colgroup>
+            <thead>
+              <tr>
+                <th>发送时间</th>
+                <th>版本名称</th>
+                <th>状态</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody id="externalTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-mask" id="externalSnapshotMask" hidden>
+    <div class="modal hotfix-shell" role="dialog" aria-modal="true" aria-labelledby="externalSnapshotTitle">
+      <header class="hotfix-head">
+        <h2 class="modal-title" id="externalSnapshotTitle">渠道配置</h2>
+        <button class="btn-ghost" type="button" id="externalSnapshotClose">关闭</button>
+      </header>
+      <div class="hotfix-body">
+        <div class="panel">
+          <table class="data-table">
+            <colgroup>
+              <col class="col-external-snapshot-group" />
+              <col class="col-external-snapshot-package" />
+              <col class="col-external-snapshot-mention" />
+              <col class="col-external-snapshot-copy" />
+              <col class="col-external-snapshot-status" />
+            </colgroup>
+            <thead>
+              <tr>
+                <th>群聊</th>
+                <th>渠道包</th>
+                <th>@的人</th>
+                <th>文案</th>
+                <th>状态</th>
+              </tr>
+            </thead>
+            <tbody id="externalSnapshotBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-mask" id="externalDetailMask" hidden>
+    <div class="modal hotfix-shell external-detail-shell" role="dialog" aria-modal="true" aria-labelledby="externalDetailTitle">
+      <header class="hotfix-head">
+        <h2 class="modal-title" id="externalDetailTitle">发送详情</h2>
+        <button class="btn-ghost" type="button" id="externalDetailClose">关闭</button>
+      </header>
+      <div class="hotfix-body" id="externalDetailBody"></div>
+    </div>
+  </div>
+
+  <div class="modal-mask" id="externalConfigMask" hidden>
+    <div class="modal hotfix-shell" role="dialog" aria-modal="true" aria-labelledby="externalConfigTitle">
+      <header class="hotfix-head">
+        <h2 class="modal-title" id="externalConfigTitle">渠道配置</h2>
+        <div class="topbar-actions">
+          <button class="btn-primary" type="button" id="externalSendAllBtn">全部发送</button>
+          <button class="btn-internal" type="button" id="externalAddBtn">新增</button>
+          <button class="btn-ghost" type="button" id="externalConfigClose">关闭</button>
+        </div>
+      </header>
+      <div class="hotfix-body">
+        <div class="panel">
+          <table class="data-table">
+            <colgroup>
+              <col class="col-external-group" />
+              <col class="col-external-package" />
+              <col class="col-external-mention" />
+              <col class="col-external-copy" />
+              <col class="col-external-action" />
+            </colgroup>
+            <thead>
+              <tr>
+                <th>群聊</th>
+                <th>渠道包</th>
+                <th>@的人</th>
+                <th>文案</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody id="externalConfigBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-mask" id="externalEditMask" hidden>
+    <div class="modal internal-modal" role="dialog" aria-labelledby="externalEditTitle" aria-modal="true">
+      <h2 class="modal-title" id="externalEditTitle">新增群</h2>
+      <form id="externalForm" novalidate>
+        <label class="field">
+          <span>群聊</span>
+          <input name="group" type="text" placeholder="机器人要发到的群" required />
+        </label>
+        <label class="field">
+          <span>webhook 链接</span>
+          <input name="webhook" type="url" placeholder="https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=" />
+        </label>
+        <p class="internal-content-note">这个群发送时使用的机器人地址。</p>
+        <div class="field">
+          <span>渠道包</span>
+          <label class="external-package-unify">
+            <span>统一选择</span>
+            <select id="externalUnifyVersion" aria-label="统一选择游戏盒版本"></select>
+          </label>
+          <div id="externalPackageList" class="external-package-list"></div>
+          <button class="btn-ghost external-package-add" type="button" id="externalPackageAdd">添加渠道包</button>
+        </div>
+        <p class="internal-content-note">一个群可以发多个渠道包。可以统一选一个包套到全部渠道上，每个包也可以单独改版本、渠道和口令。</p>
+        <label class="field">
+          <span>文案</span>
+          <textarea name="copy" rows="4" placeholder="可用 {版本名称} {版本号} {下载地址} {渠道} {口令} {解析id}"></textarea>
+        </label>
+        <p class="internal-content-note">可用 {版本名称}、{版本号}、{下载地址}、{渠道}、{口令}、{解析id}，发送时按每个渠道包自己的版本填上。</p>
+        <label class="field">
+          <span>@的人</span>
+          <textarea name="mentions" rows="3" placeholder="一行一个人"></textarea>
+        </label>
+        <p class="internal-content-note">一个群可以 @ 多个人，一行写一个人。</p>
+        <span class="hint" id="externalHint" hidden></span>
+        <div class="modal-actions">
+          <button class="btn-ghost" type="button" id="externalEditCancel">取消</button>
+          <button class="btn-internal" type="submit">确定</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal-mask" id="externalSendMask" hidden>
+    <div class="modal hotfix-shell external-send-shell" role="dialog" aria-modal="true" aria-labelledby="externalSendTitle">
+      <header class="hotfix-head">
+        <h2 class="modal-title" id="externalSendTitle">发送</h2>
+        <button class="btn-ghost" type="button" id="externalSendClose">关闭</button>
+      </header>
+      <form id="externalSendForm" class="external-send-form" novalidate>
+        <div class="hotfix-body">
+          <p class="internal-content-note">勾选的群会把它下面的每个渠道包都发出去，并 @ 这个群里的所有人。</p>
+          <div id="externalSendList" class="external-send-list"></div>
+          <span class="hint" id="externalSendHint" hidden></span>
+        </div>
+        <div class="hotfix-footer">
+          <div class="modal-actions">
+            <button class="btn-ghost" type="button" id="externalSendCancel">取消</button>
+            <button class="btn-primary" type="submit">发送</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <div class="hotfix-toast" id="hotfixToast" role="status" hidden></div>
   <div class="hotfix-toast" id="betaToast" role="status" hidden></div>
 
-  <script src="app.js?v=65"></script>
+  <script src="app.js?v=79"></script>
   <script src="hotfix.js?v=9"></script>
 </body>
 </html>
