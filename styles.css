@@ -1328,10 +1328,19 @@ select {
 #externalDetailMask { z-index: 3; }
 
 .col-external-snapshot-group { width: 16%; }
-.col-external-snapshot-package { width: 34%; }
+.col-external-snapshot-package { width: 30%; }
 .col-external-snapshot-mention { width: 16%; }
-.col-external-snapshot-copy { width: 20%; }
-.col-external-snapshot-status { width: 14%; }
+.col-external-snapshot-copy { width: 18%; }
+.col-external-snapshot-status { width: 20%; }
+
+.external-snapshot-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+.external-snapshot-status .btn-link { margin-right: 0; }
 
 .external-snapshot-status + .external-snapshot-status { margin-top: 6px; }
 

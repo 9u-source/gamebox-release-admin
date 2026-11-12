@@ -2448,15 +2448,20 @@ function externalConfigPackageText(pkg) {
   return `${name} · ${channel} · ${externalPayloadLabel(pkg.payload)}`;
 }
 
-function openExternalSnapshot(item) {
+let viewingExternalSend = null;
+
+function renderExternalSnapshot(item) {
   const rows = item.config || [];
   externalSnapshotTitle.textContent = `${item.sentAt} 的渠道配置`;
-  externalSnapshotBody.innerHTML = rows.length ? rows.map((row) => {
+  externalSnapshotBody.innerHTML = rows.length ? rows.map((row, rowIndex) => {
     const mentions = row.mentions && row.mentions.length ? row.mentions.join("、") : "";
     const packages = (row.packages || []).map((pkg) => escapeHtml(externalConfigPackageText(pkg))).join("\n");
-    const statuses = (row.packages || []).map((pkg) => {
+    const statuses = (row.packages || []).map((pkg, pkgIndex) => {
       const status = externalExecutionStatus(pkg);
-      return `<div class="external-snapshot-status"><span class="update-mode is-${status}">${externalStatusLabel(status)}</span></div>`;
+      const retry = status === "failed"
+        ? `<button class="btn-link" type="button" data-action="retry" data-id="${item.id}" data-row="${rowIndex}" data-pkg="${pkgIndex}">重试</button>`
+        : "";
+      return `<div class="external-snapshot-status"><span class="update-mode is-${status}">${externalStatusLabel(status)}</span>${retry}</div>`;
     }).join("");
     const preview = externalCopyPreview(row.copy);
     return `<tr>
@@ -2467,12 +2472,54 @@ function openExternalSnapshot(item) {
       <td>${statuses}</td>
     </tr>`;
   }).join("") : '<tr><td class="empty" colspan="5">这次没有渠道配置</td></tr>';
+}
+
+function openExternalSnapshot(item) {
+  viewingExternalSend = item;
+  renderExternalSnapshot(item);
   externalSnapshotMask.hidden = false;
   externalSnapshotClose.focus();
 }
 
 function closeExternalSnapshot() {
+  viewingExternalSend = null;
   externalSnapshotMask.hidden = true;
+}
+
+function refreshExternalSendStatus(item) {
+  const packages = (item.config || []).flatMap((row) => row.packages || []);
+  const okCount = packages.filter((pkg) => externalExecutionStatus(pkg) === "success").length;
+  item.status = okCount === packages.length ? "success" : okCount === 0 ? "failed" : "partial";
+}
+
+function retryExternalConfig(send, rowIndex, pkgIndex) {
+  const row = (send.config || [])[rowIndex];
+  const pkg = row && (row.packages || [])[pkgIndex];
+  if (!row || !pkg || externalExecutionStatus(pkg) !== "failed") return;
+  const version = externalVersionOf(pkg.versionId);
+  const link = version ? externalChannelLink(version, pkg.channel, pkg.passcode) : "";
+  const parseId = version ? version.parseId || "" : "";
+  const message = version ? fillExternalCopy(row.copy, version, pkg.channel, pkg.passcode, link, parseId) : "";
+  const delivered = pkg.payload === "apk" ? link : pkg.payload === "parse" ? parseId : message;
+  const ok = Boolean(version && pkg.channel && delivered);
+  pkg.ok = ok;
+  pkg.result = ok ? "success" : "failed";
+  const delivery = (send.deliveries || [])[rowIndex];
+  const sent = delivery && (delivery.items || [])[pkgIndex];
+  if (sent) {
+    sent.ok = ok;
+    if (ok) {
+      sent.content = pkg.payload === "apk"
+        ? `${message}\n安装包：${link}`
+        : pkg.payload === "parse"
+          ? `${message}\n解析id：${parseId}`
+          : message;
+    }
+  }
+  refreshExternalSendStatus(send);
+  renderExternalList();
+  if (viewingExternalSend && viewingExternalSend.id === send.id) renderExternalSnapshot(send);
+  showBetaToast(ok ? "重试成功" : "重试失败");
 }
 
 function openExternalDetail(item) {
@@ -2911,6 +2958,13 @@ externalTableBody.addEventListener("click", (event) => {
 externalSnapshotClose.addEventListener("click", closeExternalSnapshot);
 externalSnapshotMask.addEventListener("click", (event) => {
   if (event.target === externalSnapshotMask) closeExternalSnapshot();
+});
+externalSnapshotBody.addEventListener("click", (event) => {
+  const button = event.target.closest("button");
+  if (!button || button.dataset.action !== "retry") return;
+  const send = externalSends.find((row) => row.id === Number(button.dataset.id));
+  if (!send) return;
+  retryExternalConfig(send, Number(button.dataset.row), Number(button.dataset.pkg));
 });
 externalDetailClose.addEventListener("click", closeExternalDetail);
 externalDetailMask.addEventListener("click", (event) => {
